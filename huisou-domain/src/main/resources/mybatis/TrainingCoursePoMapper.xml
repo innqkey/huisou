@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.TrainingCoursePoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.TrainingCoursePo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="courseid" jdbcType="INTEGER" property="courseid" />
+    <result column="coursename" jdbcType="VARCHAR" property="coursename" />
+    <result column="courseaddress" jdbcType="VARCHAR" property="courseaddress" />
+    <result column="coursedays" jdbcType="VARCHAR" property="coursedays" />
+    <result column="coursetime" jdbcType="TIMESTAMP" property="coursetime" />
+   	<result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+ <select id="getIndex" resultType="com.huisou.vo.TrainingCourseVo">
+ 	SELECT
+		t1.*
+	FROM
+		crm_training_course t1
+	<where>
+		<if test="coursename!=null and coursename!=''">
+			and t1.`coursename` like CONCAT('%',#{coursename},'%')
+		</if>
+		<if test="startDate!=null and startDate!=''">
+			and t1.coursetime &gt;= #{startDate}
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			and t1.coursetime &lt;= #{endDate}
+		</if>
+	</where>
+	ORDER BY t1.coursetime DESC
+ </select>
+ 
+ <select id="findTrainingCourseBycourseid" parameterType="java.lang.Integer" resultType="com.huisou.po.TrainingCoursePo" >
+   SELECT
+		*
+	FROM
+		crm_training_course
+	WHERE
+		courseid = #{courseid}
+ </select>
+ <select id="findAll" resultType="com.huisou.vo.TrainingCourseVo">
+ 	SELECT * FROM crm_training_course ORDER BY coursetime DESC
+ </select>
+ 
+ <select id="getInvitecount" parameterType="java.lang.Integer" resultType="java.lang.Integer"> 
+ 	SELECT
+	 COUNT(t2.courseid  ) invitecount
+	FROM
+		crm_training_course t1
+	LEFT JOIN crm_invite_record t2 ON t1.courseid = t2.courseid
+	WHERE t1.courseid =#{courseid}
+ </select>
+ 
+  <select id="getTraincount" parameterType="java.lang.Integer" resultType="java.lang.Integer"> 
+ 	SELECT
+	 COUNT(t2.courseid  ) traincount
+	FROM
+		crm_training_course t1
+	LEFT JOIN crm_training_record t2 ON t1.courseid = t2.courseid
+	WHERE t1.courseid =#{courseid}
+ </select>
+ 
+ <update id="updateOne">
+ 	UPDATE `crm_training_course`
+	SET `courseid` = #{courseid},
+	 `coursename` =  #{coursename},
+	 `courseaddress` =  #{courseaddress},
+	 `coursedays` =  #{coursedays},
+	 `coursetime` =  #{coursetime}
+	WHERE
+		courseid =#{courseid}
+ 	
+ </update>
+</mapper>

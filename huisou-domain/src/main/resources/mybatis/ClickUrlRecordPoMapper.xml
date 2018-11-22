@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.ClickUrlRecordPoMapper">
+	<resultMap id="BaseResultMap" type="com.huisou.po.ClickUrlRecordPo">
+		<!-- WARNING - @mbg.generated -->
+		<id column="clickid" jdbcType="INTEGER" property="clickid" />
+		<result column="custuserid" jdbcType="INTEGER" property="custuserid" />
+		<result column="itemid" jdbcType="INTEGER" property="itemid" />
+		<result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+		<result column="urlid" jdbcType="INTEGER" property="urlid" />
+		<result column="accountid" jdbcType="INTEGER" property="accountid" />
+		<result column="createby" jdbcType="INTEGER" property="createby" />
+		<result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+		<result column="updateby" jdbcType="INTEGER" property="updateby" />
+		<result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+		<result column="standby1" jdbcType="VARCHAR" property="standby1" />
+		<result column="standby2" jdbcType="VARCHAR" property="standby2" />
+	</resultMap>
+	<!-- 最近登陆次数 -->
+	<select id="findAll" resultType="com.huisou.vo.ClickUrlRecordVo">
+		select
+		t.*,
+		t1.lastSevenCount,
+		COUNT(*) as clickAllCount
+		FROM
+		crm_click_url_record t
+		LEFT JOIN
+		(SELECT
+		itemtype,
+		COUNT(*) as lastSevenCount
+		FROM
+		crm_click_url_record
+		WHERE 1=1
+		<if test="custuserid != null and custuserid != ''">
+			and custuserid = #{custuserid} 
+		</if>
+		<if test="beginDate!=null and beginDate!=''">
+    		<![CDATA[   and DATE_FORMAT(createdate, '%Y-%m-%d')>=  DATE_FORMAT(#{beginDate}, '%Y-%m-%d')   ]]>
+		</if>
+		<if test="endDate!=null and endDate!=''">
+   			<![CDATA[  and DATE_FORMAT(createdate, '%Y-%m-%d') <= DATE_FORMAT(#{endDate}, '%Y-%m-%d')    ]]>
+		</if>
+		GROUP BY itemtype
+		) t1
+		ON t.itemtype = t1.itemtype
+		<if test="custuserid != null and custuserid != ''">
+		and t.custuserid = #{custuserid}
+		</if>
+		GROUP BY itemtype
+	</select>
+
+</mapper>

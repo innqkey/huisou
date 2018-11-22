@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.ItemAccountNumberPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.ItemAccountNumberPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="accountid" jdbcType="INTEGER" property="accountid" />
+    <result column="custuserid" jdbcType="INTEGER" property="custuserid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="urlid" jdbcType="INTEGER" property="urlid" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="comments" jdbcType="VARCHAR" property="comments" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+	<insert id="add">
+		INSERT INTO `crm_item_account_number` (
+			`custuserid`,
+			`itemid`,
+			`urlid`,
+			`url`,
+			`username`,
+			`password`,
+			`comments`,
+			`createdate`,
+			`contact`,
+			`phone`,
+			`itemname`,
+			`itemtype`
+		)
+		VALUES
+			(
+				#{custuserid},
+				#{itemid},
+				#{urlid},
+				#{url},
+				#{username},
+				#{password},
+				#{comments},
+				#{createdate},
+				#{contact},
+				#{phone},
+				#{itemname},
+				#{itemtype}
+			);
+	</insert>
+	
+	<insert id="addAccount">
+		INSERT INTO `crm_item_account_number` (
+			`custuserid`,
+			`itemid`,
+			`urlid`,
+			`url`,
+			`username`,
+			`password`,
+			`comments`,
+			`createdate`,
+			`contact`,
+			`phone`,
+			`itemname`,
+			`itemtype`,
+			`saleid`
+		)
+		VALUES
+			(
+				#{custuserid},
+				#{itemid},
+				#{urlid},
+				#{url},
+				#{username},
+				#{password},
+				#{comments},
+				#{createdate},
+				#{contact},
+				#{phone},
+				#{itemname},
+				#{itemtype},
+				#{saleid}
+			);
+	
+	</insert>
+	
+  	<select id="findByItemid" parameterType="java.lang.Integer" resultType="com.huisou.po.ItemAccountNumberPo">
+  		SELECT
+			*
+		FROM
+			crm_item_account_number
+		WHERE
+			itemid = #{itemid}
+  	</select>
+  	
+  	<update id="update"> 
+  		UPDATE
+		crm_item_account_number
+		SET
+		username = #{username},
+		password = #{password},
+		url = #{url},
+		comments = #{comments}
+		WHERE
+		accountid = #{accountid}
+  	</update>
+  	
+  	<select id="search" resultType="com.huisou.vo.ItemAccountNumberVo">
+  		SELECT
+			*
+		FROM
+			crm_item_account_number
+		<where>
+			<if test="contact != null and contact != ''">
+			  and contact like CONCAT('%',#{contact},'%')
+			</if>
+			<if test="phone != null and phone != ''">
+			  and phone like CONCAT('%',#{phone},'%')
+			</if>
+			<if test="itemname != null and itemname != ''">
+			  and itemname like CONCAT('%',#{itemname},'%')
+			</if>
+		</where>
+  	</select>
+  	
+  	<select id="searchBySaleid" resultType="com.huisou.vo.ItemAccountNumberVo">
+  		SELECT
+			*
+		FROM
+			crm_item_account_number
+		<where>
+			<if test="contact != null and contact != ''">
+			  and contact like CONCAT('%',#{contact},'%')
+			</if>
+			<if test="phone != null and phone != ''">
+			  and phone like CONCAT('%',#{phone},'%')
+			</if>
+			<if test="itemname != null and itemname != ''">
+			  and itemname like CONCAT('%',#{itemname},'%')
+			</if>
+			<if test="saleid != null and saleid != ''">
+			  and saleid =#{saleid}
+			</if>
+		</where>
+  	</select>
+  	
+  	<select id="findItemListByCustuserid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+  		SELECT itemid FROM crm_item_account_number WHERE custuserid = #{custuserid}
+  	</select>
+  	
+  	<select id="findItemAccountNumberPoList" parameterType="java.lang.Integer" resultType="com.huisou.vo.ItemAccountNumberVo">
+  		SELECT * FROM crm_item_account_number WHERE itemid = #{itemid}
+  	</select>
+  	
+  	<select id="findAccountListByCusterid" parameterType="java.lang.Integer" resultType="com.huisou.vo.ItemAccountNumberVo">
+  		SELECT * FROM crm_item_account_number WHERE custuserid = #{custuserid}
+  	</select>
+  	
+  	<select id="findByAccountid" parameterType="java.lang.Integer" resultType="com.huisou.po.ItemAccountNumberPo">
+  		SELECT * FROM crm_item_account_number WHERE accountid = #{accountid}
+  	</select>
+  	<select id="findByItemIdAndUrlId" resultType="com.huisou.po.ItemAccountNumberPo">
+  		SELECT * FROM crm_item_account_number WHERE itemid = #{itemid} AND urlid=#{urlid}
+  	</select>
+</mapper>

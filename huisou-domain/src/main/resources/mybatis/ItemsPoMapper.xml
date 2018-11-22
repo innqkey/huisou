@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.ItemsPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.ItemsPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="itemtypedetail" jdbcType="INTEGER" property="itemtypedetail" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="itembegindate" jdbcType="TIMESTAMP" property="itembegindate" />
+    <result column="itemenddate" jdbcType="TIMESTAMP" property="itemenddate" />
+    <result column="itemstatus" jdbcType="INTEGER" property="itemstatus" />
+    <result column="status" jdbcType="INTEGER" property="itemstatus" />
+    <result column="contnum" jdbcType="VARCHAR" property="contnum" />
+    <result column="itemrequire" jdbcType="VARCHAR" property="itemrequire" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="tradetype" jdbcType="INTEGER" property="tradetype" />
+    <result column="auditstatus" jdbcType="INTEGER" property="auditstatus" />
+    <result column="markstatus" jdbcType="INTEGER" property="markstatus" />
+    <result column="relatecontstatus" jdbcType="INTEGER" property="relatecontstatus" />
+    <result column="relateitemid" jdbcType="INTEGER" property="relateitemid" />
+    <result column="relatedesc" jdbcType="VARCHAR" property="relatedesc" />
+    <result column="standby3" jdbcType="VARCHAR" property="standby3" />
+    <result column="standby4" jdbcType="VARCHAR" property="standby4" />
+  </resultMap>
+  <update id="updateSalesman" parameterType="java.lang.Integer">
+  		update crm_items   SET  saleid=#{endsaleid}  WHERE itemid=#{itemid};
+  </update>
+  
+  <update id="changemarkStatus">
+  		update crm_items  SET 	markstatus=
+  			<if test="markstatus==1  or markstatus=='1'">
+  				1
+  			</if>
+  			<if test="markstatus==0  or markstatus=='0'">
+  				0
+  			</if>
+  			WHERE itemid  in
+  		<foreach collection="itemids" index="index" item="itemid" separator="," open="(" close=")">
+  			<if test="itemid!=null">
+				#{itemid}	
+  			</if>
+  		</foreach>
+  </update>
+  
+  <select id="selectItemByCustidOrderByBeginDate" resultType="ItemsPo">
+  		SELECT  * from  crm_items where custid=#{custid} ORDER BY itembegindate ASC
+  </select>
+  
+  <select id="selectAllItems" resultType="ItemsPo">
+  		SELECT  * from  crm_items
+  </select>
+   <select id="findItemById" parameterType="Integer" resultType="ItemsPo">
+  		SELECT  * from  crm_items where itemid=#{itemid};
+  </select>
+  
+   <update id="changStatus" parameterType="java.lang.Integer">
+  		update crm_items  
+  			set status=#{status}  
+  			where itemid=#{itemid}
+  </update>
+  
+  
+  <insert id="insertItemsReturnId" parameterType="com.huisou.po.ItemsPo" useGeneratedKeys="true" keyProperty="itemsPo.itemid"  >
+  		
+  		INSERT INTO `huisou_crm`.`crm_items` (
+					`itemname`,
+					`itemtype`,
+					`itemtypedetail`,
+					`custid`,
+					`saleid`,
+					`itembegindate`,
+					`itemenddate`,
+					`itemstatus`,
+					`contnum`,
+					`itemrequire`,
+					`createby`,
+					`createdate`,
+					`standby3`
+				)
+				VALUES
+					(
+						#{itemsPo.itemname},
+						#{itemsPo.itemtype},
+						#{itemsPo.itemtypedetail},
+						#{itemsPo.custid},
+						#{itemsPo.saleid},
+						#{itemsPo.itembegindate},
+						#{itemsPo.itemenddate},
+						#{itemsPo.itemstatus},
+						#{itemsPo.contnum},
+						#{itemsPo.itemrequire},
+						#{itemsPo.createby},
+						#{itemsPo.createdate},
+						#{itemsPo.standby3}
+					)
+	 
+  </insert>
+  
+  <select id="selectItemsPoByCustid" parameterType="java.lang.Integer" resultType="com.huisou.po.ItemsPo">
+  		SELECT
+			*
+		FROM
+			crm_items
+		WHERE
+			custid = #{custid}
+  </select>
+  
+</mapper>

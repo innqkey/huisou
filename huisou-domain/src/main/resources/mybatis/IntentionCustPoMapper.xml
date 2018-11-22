@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.IntentionCustPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.IntentionCustPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="intentioncustid" jdbcType="INTEGER" property="intentioncustid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="companyname" jdbcType="VARCHAR" property="companyname" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+   	<result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+ 	<insert id="insertOne" parameterType="com.huisou.po.IntentionCustPo" useGeneratedKeys="true" keyProperty="intentionCustPo.intentioncustid" >
+ 		INSERT INTO `crm_intention_cust` (
+			`name`,
+			`phone`,
+			`companyname`,
+			`address`,
+			`createby`,
+			`createdate`,
+			`updateby`,
+			`updatedate`,
+			`standby1`,
+			`standby2`
+		)
+		VALUES
+			(
+				#{intentionCustPo.name},
+				#{intentionCustPo.phone},
+				#{intentionCustPo.companyname},
+				#{intentionCustPo.address},
+				#{intentionCustPo.createby},
+				#{intentionCustPo.createdate},
+				#{intentionCustPo.updateby},
+				#{intentionCustPo.updatedate},
+				#{intentionCustPo.standby1},
+				#{intentionCustPo.standby2}
+			);
+ 	</insert>
+ 
+ 	<select id="selectOneByPhoneAndName" resultType="com.huisou.po.IntentionCustPo">
+ 		SELECT
+			*
+		FROM
+			crm_intention_cust
+		WHERE
+			`name` = #{name}
+		AND phone = #{phone}
+ 	</select>
+ 	
+ 	<select id="findAll" resultType="com.huisou.po.IntentionCustPo">
+ 		SELECT
+			*
+		FROM
+			crm_intention_cust
+		<where>
+			<if test="name!=null and name!=''">
+				and name like CONCAT('%',#{name},'%')
+			</if>
+		</where>
+ 	</select>
+ 	
+ 	<update id="update">
+ 		UPDATE `crm_intention_cust`
+		SET 
+		 `name` = #{name},
+		 `phone` = #{phone},
+		 `companyname` = #{companyname},
+		 `address` = #{address},
+		 `updateby` = #{updateby}
+		WHERE
+			`intentioncustid` = #{intentioncustid}
+ 	</update>
+</mapper>

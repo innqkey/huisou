@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.MenuPoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.MenuPo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="menuid" jdbcType="INTEGER" property="menuid"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="menuname" jdbcType="VARCHAR" property="menuname"/>
+        <result column="menucode" jdbcType="INTEGER" property="menucode"/>
+        <result column="fatherid" jdbcType="INTEGER" property="fatherid"/>
+        <result column="target" jdbcType="VARCHAR" property="target"/>
+        <result column="standby1" jdbcType="VARCHAR" property="standby1"/>
+        <result column="standby2" jdbcType="VARCHAR" property="standby2"/>
+    </resultMap>
+
+    <select id="selectMainMenuPo" resultMap="BaseResultMap">
+    select * from crm_menu
+    where menucode = 1
+  </select>
+
+    <select id="selectMainMenuPo2" resultMap="BaseResultMap">
+        select * from crm_menu
+        where menucode = 1
+    </select>
+
+    <select id="selectChildMenuPo2" parameterType="java.lang.Integer" resultType="com.huisou.vo.ChildMenuVo">
+
+        SELECT
+	t1.menuid,t1.url,t1.menuname,t1.menucode,t1.target,t1.fatherid,t2.menuname as fathername
+FROM
+	crm_menu t1
+LEFT JOIN crm_menu t2 ON t1.fatherid = t2.menuid
+WHERE
+	t1.menucode = 0
+AND t1.fatherid = #{fatherId, jdbcType=INTEGER}
+
+    </select>
+
+    <select id="selectChildMenuPo" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select * from crm_menu
+    where menucode = 0 and fatherid = #{fatherId, jdbcType=INTEGER}
+  </select>
+
+
+    <select id="selectMenuAndSources" parameterType="java.util.ArrayList" resultType="com.huisou.vo.MenuSourcesVo">
+        SELECT
+        t1.menuid ,
+        t1.url AS menuurl ,
+        t1.menuname ,
+        t2.url AS childurl ,
+        t2.menuname AS childname ,
+        t3.sourcesid ,
+        t3.url AS sourcesurl ,
+        t3.sourcesname ,
+        t3.menuid AS sourcesfatherid
+        FROM
+        crm_menu t1
+        LEFT JOIN crm_menu t2 ON t1.menuid = t2.fatherid
+        RIGHT JOIN crm_sources t3 ON t2.menuid = t3.menuid
+        WHERE
+        <if test="fatherId!=null">
+            t3.menuid IN
+            <foreach collection="fatherId" index="index" item="item" separator="," open="(" close=")">
+                <if test="item!=null">
+                    #{item}
+                </if>
+            </foreach>
+        </if>
+        <if test="sourcesId!=null">
+            AND t3.sourcesid IN
+            <foreach collection="sourcesId" index="index" item="item" separator="," open="(" close=")">
+                <if test="item!=null">
+                    #{item}
+                </if>
+            </foreach>
+            AND
+        </if>
+        t1.menucode = 1
+        ORDER BY
+        t1.menuid ,
+        t3.menuid
+    </select>
+
+
+    <select id="selectMenuId" parameterType="java.lang.Integer" resultType="com.huisou.po.AuthorityPo">
+        SELECT
+        t2.*
+        FROM
+        crm_role_authority t1 ,
+        crm_authority t2
+        WHERE
+        t1.roleid = #{roleid, jdbcType=INTEGER}
+        AND
+        t1.authorityid = t2.authorityid
+        AND t2.`status` = 1
+    </select>
+
+    <select id="selectMenuIdByChildId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select fatherid from crm_menu
+        where menucode = 0 AND  menuid = #{menuid, jdbcType=INTEGER}
+    </select>
+
+    <update id="update" parameterType="com.huisou.po.MenuPo">
+        update crm_menu
+        <set>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="menuname != null">
+                menuname = #{menuname,jdbcType=VARCHAR},
+            </if>
+            <if test="menucode != null">
+                menucode = #{menucode,jdbcType=INTEGER},
+            </if>
+            <if test="fatherid != null">
+                fatherid = #{fatherid,jdbcType=INTEGER},
+            </if>
+            <if test="target != null">
+                target = #{target,jdbcType=VARCHAR},
+            </if>
+            <if test="standby1 != null">
+                standby1 = #{standby1,jdbcType=VARCHAR},
+            </if>
+            <if test="standby2 != null">
+                standby2 = #{standby2,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where menuid = #{menuid,jdbcType=INTEGER}
+    </update>
+</mapper>

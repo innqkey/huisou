@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.ServiceItemPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.ServiceItemPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="serviceid" jdbcType="INTEGER" property="serviceid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="serremark" jdbcType="VARCHAR" property="serremark" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  
+  <sql id="selectsql">
+	SELECT
+		t1.province,
+		t1.area,
+		t1.city,
+		t1.custid,
+		t1.contact,
+		t1.phone,
+		t1.weixin,
+		t1.email,
+		t1.address,
+		t1.custstatus,
+		t3.itemid,
+		t3.itemname,
+		t3.status,
+		t3.itemtype,
+		t3.itemtypedetail,
+		t3.itemenddate,
+		t3.auditstatus,
+		t3.relatecontstatus,
+		t3.tradetype,
+		t3.commitstatus,
+		t3.itembegindate,
+		t2.saleid,
+		t2.salename,
+		t1.companyname,
+		si.userid,
+		u.petname,
+		t3.standby3,
+		t3.standby2,
+		si.serremark
+	FROM
+		crm_items t3
+	LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+	LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+   	LEFT JOIN crm_service_item si on t3.itemid = si.itemid
+	LEFT JOIN crm_user u on si.userid = u.userid
+  </sql>
+  
+  <select id="searchItemListByCon" resultType="UniversalPo" parameterType="java.util.Map">
+  		<include refid="selectsql"></include>
+  		 where 1=1
+		<!-- 用于手机端的搜索 -->
+		<if test='searchvalue !=null and searchvalue !=""'>
+			and (
+				t1.phone like CONCAT('%',#{searchvalue},'%') 
+				or t1.contact like  CONCAT('%',#{searchvalue},'%' )
+				or t1.companyname like  CONCAT('%',#{searchvalue},'%' ) 
+				or t3.itemname like CONCAT('%',#{searchvalue},'%' )
+				or t2.salename LIKE CONCAT('%',#{searchvalue}, '%')
+				or t3.standby2 LIKE CONCAT('%',#{searchvalue}, '%')
+			)
+		</if>
+		<if test='begindate !=null and begindate!="" '>
+			<![CDATA[ and t3.itembegindate >=#{begindate} ]]>
+		</if>
+		<if test='enddate !=null and enddate!="" '>
+			<![CDATA[ and t3.itembegindate<=#{enddate} ]]>
+		</if>
+		<if test='tradetype!=null and tradetype!=""'>
+			AND t3.tradetype =#{tradetype}
+		</if>
+		<if test="itemtype != null and itemtype != ''">
+			AND t3.itemtype =#{itemtype}
+		</if>
+		<if test="contractstatus != null and contractstatus != '' and contractstatus != 0">
+			AND t3.relatecontstatus =#{contractstatus}
+		</if>
+		<if test="salenull != null and salenull != '' and salenull == 0">
+			<![CDATA[ AND t3.saleid = 0 ]]>
+		</if>
+		
+		<if test="overdue != null and overdue != ''">
+			AND t3.itemenddate &lt; NOW()
+		</if>
+		<if test="userid != null and userid != ''">
+			AND si.userid = #{userid}
+		</if>
+		<if test="sortcondition == null or sortcondition == ''" >
+			<![CDATA[ ORDER BY  t3.itemid desc ]]>
+		</if>
+		<if test="sortcondition != null and sortcondition != ''" >
+			<if test="sortcondition==1">
+				<![CDATA[ ORDER BY  t3.createdate desc ]]>
+			</if>
+			<if test="sortcondition==2">
+				<![CDATA[ ORDER BY  t3.updatedate desc ]]>
+			</if>
+			<if test="sortcondition==3">
+				<![CDATA[ ORDER BY  t3.itembegindate desc ]]>
+			</if>
+			<if test="sortcondition==4">
+				<![CDATA[ ORDER BY  t3.itemenddate desc,t3.itembegindate desc ]]>
+			</if>
+		</if>
+		 
+  </select>
+    <!-- 根据userid 查询关联项目 -->
+  	<select id="findItems" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		select *
+  		from crm_service_item s
+  		where 1=1
+  		and s.status = 1
+        <if test="userid != null and userid != ''">
+            and s.userid = #{userid}
+        </if>
+  	</select>
+  
+  
+</mapper>

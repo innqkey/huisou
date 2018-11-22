@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.DailyPoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.DailyPo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="dailyid" jdbcType="INTEGER" property="dailyid"/>
+        <result column="userid" jdbcType="INTEGER" property="userid"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="complete" jdbcType="VARCHAR" property="complete"/>
+        <result column="uncomplete" jdbcType="VARCHAR" property="uncomplete"/>
+        <result column="needhelp" jdbcType="VARCHAR" property="needhelp"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="createtime" jdbcType="VARCHAR" property="createtime"/>
+        <result column="reader" jdbcType="INTEGER" property="reader"/>
+        <result column="comment" jdbcType="VARCHAR" property="comment"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="standby1" jdbcType="VARCHAR" property="standby1"/>
+        <result column="standby2" jdbcType="VARCHAR" property="standby2"/>
+    </resultMap>
+
+
+    <select id="findAll" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select * from crm_daily
+        where 1=1
+        <if test="userids != null">
+            and userid in
+            <foreach collection="userids" index="index" item="item" separator="," open="(" close=")">
+                <if test="item!=null">
+                    #{item}
+                </if>
+            </foreach>
+        </if>
+        <if test="status != null">
+            and status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="type != null">
+            and type = #{type,jdbcType=VARCHAR}
+        </if>
+        <if test="beginDate != null">
+            and createtime &gt;= #{beginDate,jdbcType=VARCHAR}
+        </if>
+        <if test="endDate != null">
+            and createtime &lt;= #{endDate,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="findAllUnRead" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select * from crm_daily
+        where reader = #{reader,jdbcType=INTEGER} and status = #{status,jdbcType=INTEGER}
+    </select>
+
+    <update id="updateStatus" parameterType="java.lang.Integer">
+    update crm_daily set status = 1 where dailyid = #{dailyid,jdbcType=INTEGER}
+  </update>
+
+    <update id="updateDaily" parameterType="com.huisou.po.DailyPo">
+        update crm_daily set comment= #{comment,jdbcType=VARCHAR}  where dailyid = #{dailyid,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertBackId" parameterType="com.huisou.po.DailyPo" useGeneratedKeys="true" keyProperty="dailyid">
+        INSERT INTO crm_daily
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="dailyid != null">
+                dailyid,
+            </if>
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="complete != null">
+                complete,
+            </if>
+            <if test="uncomplete != null">
+                uncomplete,
+            </if>
+            <if test="needhelp != null">
+                needhelp,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createtime != null">
+                createtime,
+            </if>
+            <if test="reader != null">
+                reader,
+            </if>
+            <if test="comment != null">
+                comment,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="standby1 != null">
+                standby1,
+            </if>
+            <if test="standby2 != null">
+                standby2
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dailyid != null">
+                #{dailyid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="complete != null">
+                #{complete,jdbcType=VARCHAR},
+            </if>
+            <if test="uncomplete != null">
+                #{uncomplete,jdbcType=VARCHAR},
+            </if>
+            <if test="needhelp != null">
+                #{needhelp,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=VARCHAR},
+            </if>
+            <if test="reader != null">
+                #{reader,jdbcType=INTEGER},
+            </if>
+            <if test="comment != null">
+                #{comment,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="standby1 != null">
+                #{standby1,jdbcType=VARCHAR},
+            </if>
+            <if test="standby2 != null">
+                #{standby2,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.CustomerUserLoginRecordPoMapper">
+	<resultMap id="BaseResultMap" type="com.huisou.po.CustomerUserLoginRecordPo">
+		<!-- WARNING - @mbg.generated -->
+		<id column="recordid" jdbcType="INTEGER" property="recordid" />
+		<result column="custid" jdbcType="INTEGER" property="custid" />
+		<result column="custuserid" jdbcType="INTEGER" property="custuserid" />
+		<result column="createby" jdbcType="INTEGER" property="createby" />
+		<result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+		<result column="updateby" jdbcType="INTEGER" property="updateby" />
+		<result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+		<result column="standby1" jdbcType="VARCHAR" property="standby1" />
+		<result column="standby2" jdbcType="VARCHAR" property="standby2" />
+	</resultMap>
+	<select id="selectByParas" resultType="com.huisou.vo.CustomerUserVo">
+
+		SELECT
+		t1.*,
+		t2.contact,
+		t2.phone
+		FROM
+		(
+		select
+		*,
+		MAX(createdate) as lastLoginDate,
+		COUNT(*) as loginCount
+		FROM
+		crm_customer_user_login_record
+		WHERE 1=1
+		<if test="custuserid != null and custuserid !=''">
+			custuserid = #{custuserid}
+		</if>
+		GROUP BY custuserid
+		) t1
+		LEFT JOIN crm_customer_user t2
+		ON t1.custuserid = t2.custuserid
+		<if test="orderFactor != null and orderFactor != ''">
+			<if test="orderFactor == 1">
+				ORDER BY t1.lastLoginDate ASC
+			</if>
+			<if test="orderFactor == 2">
+				ORDER BY t1.lastLoginDate DESC
+			</if>
+			<if test="orderFactor == 3">
+				ORDER BY t1.loginCount ASC
+			</if>
+			<if test="orderFactor == 4">
+				ORDER BY t1.loginCount DESC
+			</if>
+		</if>
+	</select>
+	<!-- 最近7天登陆次数 -->
+	<select id="findAll" resultMap="BaseResultMap">
+		select *
+		from crm_customer_user_login_record
+		where 1=1
+		<if test="custuserid != null and custuserid !=''">
+			and custuserid = #{custuserid}
+		</if>
+		<if test="beginDate!=null and beginDate!=''">
+    		<![CDATA[   and DATE_FORMAT(createdate, '%Y-%m-%d')>=  DATE_FORMAT(#{beginDate}, '%Y-%m-%d')   ]]>
+		</if>
+		<if test="endDate!=null and endDate!=''">
+   			<![CDATA[  and DATE_FORMAT(createdate, '%Y-%m-%d') <= DATE_FORMAT(#{endDate}, '%Y-%m-%d')    ]]>
+		</if>
+	</select>
+	<select id="selectAllByParas" resultMap="BaseResultMap">
+		select *
+		from crm_customer_user_login_record
+		where 1=1
+		<if test="custuserid != null and custuserid !=''">
+			and custuserid = #{custuserid}
+		</if>
+		ORDER BY createdate DESC
+	</select>
+
+</mapper>

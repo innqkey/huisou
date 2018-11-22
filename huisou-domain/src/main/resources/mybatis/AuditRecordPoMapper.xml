@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.AuditRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.AuditRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="auditid" jdbcType="INTEGER" property="auditid" />
+    <result column="tradeid" jdbcType="INTEGER" property="tradeid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="audituserid" jdbcType="INTEGER" property="audituserid" />
+    <result column="auditusername" jdbcType="VARCHAR" property="auditusername" />
+    <result column="auditstatus" jdbcType="INTEGER" property="auditstatus" />
+    <result column="auditremarks" jdbcType="VARCHAR" property="auditremarks" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+</mapper>

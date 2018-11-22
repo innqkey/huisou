@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.AccidentRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.AccidentRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="accidentid" jdbcType="INTEGER" property="accidentid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="cause" jdbcType="VARCHAR" property="cause" />
+    <result column="solution" jdbcType="VARCHAR" property="solution" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="solve" jdbcType="INTEGER" property="solve" />
+    <result column="department" jdbcType="INTEGER" property="department" />
+    <result column="responsible" jdbcType="VARCHAR" property="responsible" />
+    <result column="responsibleid" jdbcType="INTEGER" property="responsibleid" />
+    <result column="groupresid" jdbcType="INTEGER" property="groupresid" />
+    <result column="groupresponsible" jdbcType="VARCHAR" property="groupresponsible" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+  <!-- 多条件查找事故记录  -->
+  	<select id="queryByMultiParas"  parameterType="Map" resultMap="BaseResultMap">
+  		select *
+  		from crm_accident_record s
+  		where 1=1
+  		<if test="itemname != null and itemname !=''">
+  			and itemname like CONCAT('%', #{itemname},'%')
+  		</if>
+  		<if test="responsible != null and responsible !='' ">
+  			and responsible like CONCAT('%', #{responsible},'%')
+  		</if>
+  		<if test="groupresponsible != null and groupresponsible != '' ">
+  			and groupresponsible like CONCAT('%', #{groupresponsible},'%')
+  		</if>
+  		<if test="accidentid != null and accidentid != ''">
+            and accidentid = #{accidentid,jdbcType=INTEGER}
+        </if>
+  		ORDER BY s.time DESC
+  	</select>
+</mapper>

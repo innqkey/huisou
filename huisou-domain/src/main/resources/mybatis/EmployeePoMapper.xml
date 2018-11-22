@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.EmployeePoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.EmployeePo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="empid" jdbcType="INTEGER" property="empid" />
+    <result column="empname" jdbcType="VARCHAR" property="empname" />
+    <result column="empphone" jdbcType="VARCHAR" property="empphone" />
+    <result column="empidcard" jdbcType="VARCHAR" property="empidcard" />
+    <result column="empweixin" jdbcType="VARCHAR" property="empweixin" />
+    <result column="empemail" jdbcType="VARCHAR" property="empemail" />
+    <result column="empqq" jdbcType="VARCHAR" property="empqq" />
+    <result column="entrydate" jdbcType="TIMESTAMP" property="entrydate" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="duty" jdbcType="VARCHAR" property="duty" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="nativeplace" jdbcType="VARCHAR" property="nativeplace" />
+    <result column="empstatus" jdbcType="INTEGER" property="empstatus" />
+    <result column="urgentcont" jdbcType="VARCHAR" property="urgentcont" />
+    <result column="urgentcontphone" jdbcType="VARCHAR" property="urgentcontphone" />
+    <result column="empremark" jdbcType="VARCHAR" property="empremark" />
+    <result column="depid" jdbcType="INTEGER" property="depid" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+  	<!-- 通过业务员名字/手机号查找  -->
+  	<select id="selectByEmpParas"  parameterType="Map" resultMap="BaseResultMap">
+  		select *
+  		from crm_employee s
+  		where 1=1
+  		<if test="empname != null and empname !=''">
+  			and empname like CONCAT('%', #{empname},'%')
+  		</if>
+  		<if test="empphone != null and empphone != '' ">
+  			and empphone like CONCAT(#{empphone},'%')
+  		</if>		  
+		<if test="beginDate!=null and beginDate!=''">
+    		<![CDATA[   and DATE_FORMAT(entrydate, '%Y-%m-%d')>=  DATE_FORMAT(#{beginDate}, '%Y-%m-%d')   ]]>
+		</if>
+		<if test="endDate!=null and endDate!=''">
+   			<![CDATA[  and DATE_FORMAT(entrydate, '%Y-%m-%d') <= DATE_FORMAT(#{endDate}, '%Y-%m-%d')    ]]>
+		</if>
+		and empstatus != 2
+		ORDER BY s.createdate DESC
+  	</select>
+  	
+  	<!-- 批量插入员工 -->
+  	<insert id="addBatchList" parameterType="java.util.ArrayList" useGeneratedKeys="true"
+            keyProperty="bigid">
+        insert into crm_employee (empname, empphone, empweixin, empemail, entrydate, createby, createdate) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.empname,jdbcType=VARCHAR}, #{item.empphone,jdbcType=VARCHAR}, #{item.empweixin,jdbcType=VARCHAR},
+            #{item.empemail,jdbcType=VARCHAR},#{item.entrydate,jdbcType=TIMESTAMP},
+            #{item.createby,jdbcType=INTEGER},#{item.createdate,jdbcType=TIMESTAMP})
+   		</foreach>
+   </insert>
+</mapper>

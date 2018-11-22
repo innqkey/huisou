@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.PicRecordPoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.PicRecordPo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="picid" jdbcType="INTEGER" property="picid"/>
+        <result column="itemid" jdbcType="INTEGER" property="itemid"/>
+        <result column="pictype" jdbcType="INTEGER" property="pictype"/>
+        <result column="picstatus" jdbcType="INTEGER" property="picstatus"/>
+        <result column="picurl" jdbcType="VARCHAR" property="picurl"/>
+        <result column="createby" jdbcType="INTEGER" property="createby"/>
+        <result column="createdate" jdbcType="TIMESTAMP" property="createdate"/>
+        <result column="updateby" jdbcType="INTEGER" property="updateby"/>
+        <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate"/>
+        <result column="custid" jdbcType="INTEGER" property="custid"/>
+
+        <result column="stemfrom" jdbcType="VARCHAR" property="stemfrom"/>
+        <result column="fromid" jdbcType="INTEGER" property="fromid"/>
+    </resultMap>
+
+    <select id="findPicByItemidAndNoDelete" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		SELECT
+			picid,
+			itemid,
+			pictype,
+			picurl
+		FROM
+			`crm_pic_record`
+		WHERE
+			itemid = #{itemid}
+		AND picstatus = 0;
+  </select>
+    <select id="findPicByItemidAndNoDeleteAndDoc" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		SELECT
+			picid,
+			itemid,
+			pictype,
+			picurl
+		FROM
+			`crm_pic_record`
+		WHERE
+			itemid = #{itemid} and pictype=#{doc}
+		AND picstatus = 0;
+  </select>
+
+    <select id="findInfoByTypeAndId" parameterType="java.util.Map" resultType="java.lang.String">
+		SELECT
+		picurl
+		FROM
+		`crm_pic_record`
+		WHERE
+		pictype = #{typeid,jdbcType=INTEGER} and stemfrom=#{stem,jdbcType=VARCHAR} and fromid=#{id,jdbcType=INTEGER}
+		AND picstatus = 1;
+	</select>
+
+   <select id="findInfoByTypeAndId1" parameterType="java.util.Map" resultType="java.lang.String">
+		SELECT
+		picurl
+		FROM
+		`crm_pic_record`
+		WHERE
+		pictype = #{typeid,jdbcType=INTEGER} and stemfrom=#{stem,jdbcType=VARCHAR} and fromid=#{id,jdbcType=INTEGER}
+	</select>
+
+</mapper>

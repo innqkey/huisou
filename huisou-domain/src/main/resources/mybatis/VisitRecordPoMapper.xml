@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.VisitRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.VisitRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="visitid" jdbcType="INTEGER" property="visitid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="visitway" jdbcType="INTEGER" property="visitway" />
+    <result column="visitwayname" jdbcType="VARCHAR" property="visitwayname" />
+    <result column="visitremarks" jdbcType="VARCHAR" property="visitremarks" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="VARCHAR" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="readstatus" jdbcType="INTEGER" property="readstatus" />
+    <result column="replystatus" jdbcType="INTEGER" property="replystatus" />
+    <result column="replycontext" jdbcType="VARCHAR" property="replycontext" />
+  </resultMap>
+  <select id="findItemsAndVisit" resultType="map">
+SELECT
+	t2.visitid,
+	t1.itemid,
+	t1.custid,
+	t1.saleid,
+	t1.itemname,
+	t2.salename,
+	t2.visitwayname,
+	t2.visitremarks,
+	t2.createdate,
+	t2.visitcount,
+	t4.contact,
+	t2.readstatus,
+	t2.replystatus,
+	t2.replycontext
+FROM
+	crm_items t1
+LEFT JOIN (
+	SELECT
+		t5.custid,
+		t5.itemid,
+		t5.salename,
+		t5.visitwayname,
+		t5.visitremarks,
+		t5.createdate,
+		t5.visitid,
+		t3.visitcount,
+		t5.readstatus,
+		t5.replystatus,
+		t5.replycontext
+	FROM
+		crm_visit_record t5,
+		(
+			SELECT
+				max(createdate) mdate,
+				itemid,
+				count(*) AS visitcount
+			FROM
+				crm_visit_record
+			GROUP BY
+				itemid
+		) t3
+	WHERE
+		t5.itemid = t3.itemid
+	AND t5.createdate = t3.mdate
+) t2 ON t1.itemid = t2.itemid
+LEFT JOIN crm_customer t4 ON t2.custid = t4.custid 
+ORDER BY
+	t2.createdate DESC
+
+
+  </select>
+  
+  <select id="findVisitByVisitid" parameterType="int" resultType="com.huisou.vo.VisitRecrdVo">
+SELECT
+	t1.visitid,
+	t1.itemid,
+	t1.salename,
+	t1.createdate,
+	t1.visitway,
+	t1.visitwayname,
+	t1.visitremarks,
+	t2.contact,
+	t1.readstatus,
+	t1.replystatus, 
+	t1.replycontext
+FROM
+	crm_visit_record t1
+LEFT JOIN crm_customer t2 ON t1.custid=t2.custid
+WHERE
+	visitid = #{visitid}
+  
+  </select>
+  
+    <select id="findItemsAndVisitBySale" parameterType="com.huisou.po.SalesManPo" resultType="map">
+  SELECT
+	t2.visitid,
+	t1.itemid,
+	t1.custid,
+	t1.saleid,
+	t1.itemname,
+	t2.salename,
+	t2.visitwayname,
+	t2.visitremarks,
+	t2.createdate,
+	t2.visitcount,
+	t4.contact,
+	t2.readstatus,
+	t2.replystatus,
+	t2.replycontext
+FROM
+	crm_items t1
+LEFT JOIN (
+	SELECT
+		t5.custid,
+		t5.itemid,
+		t5.salename,
+		t5.visitwayname,
+		t5.visitremarks,
+		t5.createdate,
+		t5.visitid,
+		t3.visitcount,
+		t5.readstatus,
+  		t5.replystatus,
+   		t5.replycontext
+	FROM
+		crm_visit_record t5,
+		(
+			SELECT
+				max(createdate) mdate,
+				itemid,
+				count(*) AS visitcount
+			FROM
+				crm_visit_record
+			GROUP BY
+				itemid
+		) t3
+	WHERE
+		t5.itemid = t3.itemid
+	AND t5.createdate = t3.mdate
+) t2 ON t1.itemid = t2.itemid
+LEFT JOIN crm_customer t4 ON t2.custid = t4.custid 
+where t1.saleid=#{saleid}
+ORDER BY
+	t2.createdate DESC
+  </select>
+  
+  <select id="findVisitByItemid" parameterType="int" resultType="map">
+  SELECT
+	t2.contact,
+	t1.createdate,
+	t1.visitwayname,
+	t1.visitremarks,
+	t1.salename,
+	t1.readstatus,
+  	t1.replystatus,
+   	t1.replycontext,
+   	t3.petname
+FROM
+	crm_visit_record t1
+LEFT JOIN crm_customer t2 on t1.custid = t2.custid
+LEFT JOIN crm_user t3 on t1.createby = t3.userid
+WHERE
+	t1.itemid = #{Integer}
+ORDER BY t1.createdate DESC
+  
+  </select>
+  
+  <select id="findVisitByCustid" parameterType="int" resultType="map">
+   SELECT
+	t2.contact,
+	t1.createdate,
+	t1.visitwayname,
+	t1.visitremarks,
+	t1.salename,
+	t3.itemname
+FROM
+	crm_visit_record t1,
+	crm_customer t2,
+	crm_items t3
+WHERE
+	t1.custid = t2.custid
+AND t1.itemid = t3.itemid
+AND t1.custid = #{custid}
+ORDER BY t1.createdate DESC
+  
+  </select>
+  
+  
+  
+  <select id="findItemsAndVisitByParam" resultType="map">
+SELECT
+	t2.visitid,
+	t1.itemid,
+	t1.custid,
+	t1.saleid,
+	t1.itemname,
+	t1.standby3,
+	t6.salename,
+	t2.visitwayname,
+	t2.visitremarks,
+	t2.replystatus,
+	t2.replycontext,
+	t2.createdate,
+	t2.visitcount,
+	t4.contact,
+	t4.phone,
+	t2.petname
+FROM
+	crm_items t1
+LEFT JOIN (
+	SELECT
+		t5.custid,
+		t5.itemid,
+		t5.salename,
+		t5.visitwayname,
+		t5.visitremarks,
+		t5.createdate,
+		t5.visitid,
+		t3.visitcount,
+		t5.readstatus,
+  		t5.replystatus,
+   		t5.replycontext,
+   		(SELECT petname from crm_user where userid = t5.createby) petname
+	FROM
+		crm_visit_record t5,
+		(
+			SELECT
+				max(createdate) mdate,
+				itemid,
+				count(*) AS visitcount
+			FROM
+				crm_visit_record
+			GROUP BY
+				itemid
+		) t3
+	WHERE
+		t5.itemid = t3.itemid
+	AND t5.createdate = t3.mdate
+) t2 ON t1.itemid = t2.itemid
+LEFT JOIN crm_customer t4 ON t1.custid = t4.custid 
+LEFT JOIN crm_salesman t6 ON t1.saleid = t6.saleid
+	<where>
+	<if test="replystatus!=null and replystatus!=''">
+			and t2.replystatus= #{replystatus}
+	</if>
+	<if test="salename!=null and salename!=''">
+	and t6.salename like CONCAT('%',#{salename},'%')
+	</if>
+	<if test="salephone!=null and salephone!=''">
+	and t6.salephone like CONCAT('%',#{salephone},'%')
+	</if>
+	<if test="phone!=null and phone!=''">
+	and t4.phone like CONCAT('%',#{phone},'%')
+	</if>
+	<if test="contact!=null and contact!=''">
+	and t4.contact like CONCAT('%',#{contact},'%')
+	</if>
+	<if test="itemname!=null and itemname!=''">
+	and t1.itemname like CONCAT('%',#{itemname},'%')
+	</if>
+	<if test="starttime!=null and starttime!=''">
+	and t2.createdate &gt;= #{starttime}
+	</if>
+	<if test="endtime!=null and starttime!=''">
+	and t2.createdate &lt;= #{endtime}
+	</if>
+	
+</where>
+
+order by t2.createdate DESC,t1.itemid DESC
+
+  </select>
+  
+  
+  <select id="findItemsAndVisitByParam2" resultType="map">
+		SELECT
+			t2.visitid,
+			t1.itemid,
+			t1.custid,
+			t1.saleid,
+			t1.itemname,
+			t1.standby3,
+			t6.salename,
+			t2.visitwayname,
+			t2.visitremarks,
+			t2.createdate,
+			t2.visitcount,
+			t4.contact,
+			t4.phone,
+			t2.replystatus,
+			t2.replycontext,
+			t2.petname
+		FROM
+			crm_items t1
+		LEFT JOIN (
+			SELECT
+				t5.custid,
+				t5.itemid,
+				t5.salename,
+				t5.visitwayname,
+				t5.visitremarks,
+				t5.createdate,
+				t5.visitid,
+				t3.visitcount,
+				t5.readstatus,
+  				t5.replystatus,
+   				t5.replycontext,
+   				(SELECT petname from crm_user where userid = t5.createby) petname
+			FROM
+				crm_visit_record t5,
+				(
+					SELECT
+						max(createdate) mdate,
+						itemid,
+						count(*) AS visitcount
+					FROM
+						crm_visit_record
+					GROUP BY
+						itemid
+				) t3
+			WHERE
+				t5.itemid = t3.itemid
+			AND t5.createdate = t3.mdate
+		) t2 ON t1.itemid = t2.itemid
+		LEFT JOIN crm_customer t4 ON t1.custid = t4.custid 
+		LEFT JOIN crm_salesman t6 ON t1.saleid = t6.saleid
+	<where>
+		
+		<if test="replystatus!=null and replystatus!=''">
+			and t2.replystatus= #{replystatus}
+		</if>
+		<if test="salename!=null and salename!=''">
+			and t6.salename = #{salename}
+		</if>
+		<if test="salephone!=null and salephone!=''">
+			and t6.salephone = #{salephone}
+		</if>
+		<if test="phone!=null and phone!=''">
+		and t4.phone like CONCAT('%',#{phone},'%')
+		</if>
+		<if test="contact!=null and contact!=''">
+		and t4.contact like CONCAT('%',#{contact},'%')
+		</if>
+		<if test="itemname!=null and itemname!=''">
+		and t1.itemname like CONCAT('%',#{itemname},'%')
+		</if>
+		<if test="starttime!=null and starttime!=''">
+			and t2.createdate &gt;= #{starttime}
+		</if>
+		<if test="endtime!=null and endtime!=''">
+			and t2.createdate &lt;= #{endtime}
+		</if>
+		
+		<if test="userId!=null and userId!=''">
+			<!-- and t1.itemid in (select itemid from crm_service_item where userid=#{userId}) -->
+			and t1.itemid in (select itemid from crm_visit_record where createby=#{userId})
+		</if>
+		
+	</where>
+		order by t2.createdate DESC,t1.itemid DESC
+
+  </select>
+  
+  <update id="updateVisit" parameterType="com.huisou.po.VisitRecordPo">
+  update crm_visit_record 
+  <set>
+   <if test="visitway!=null">
+   	visitway=#{visitway},
+   </if>
+   <if test="visitwayname!=null">
+   	visitwayname=#{visitwayname},
+   </if>
+   <if test="visitremarks!=null">
+   	visitremarks=#{visitremarks},
+   </if>
+   <if test="createdate!=null">
+   	createdate=#{createdate},
+   </if>
+   <if test="updateby!=null">
+   	updateby=#{updateby},
+   </if>
+   <if test="replystatus!=null">
+   	replystatus=#{replystatus},
+   </if>
+   <if test="replycontext!=null">
+   	replycontext=#{replycontext},
+   </if>
+   
+  </set>
+  where visitid=#{visitid}
+  </update>
+  
+  <insert id="addList" parameterType="java.util.List">
+  	insert into crm_visit_record (itemid,custid,saleid,salename,visitway,visitwayname,visitremarks,createby,createdate)
+  	values
+  	<foreach collection="list" item ="item" index ="index" separator =",">
+  	(#{item.itemid},#{item.custid},{item.saleid},#{item.salename},#{item.visitway},#{item.visitwayname},#{item.visitremarks},#{item.createby},#{item.createdate})
+  	</foreach>
+  </insert>
+</mapper>

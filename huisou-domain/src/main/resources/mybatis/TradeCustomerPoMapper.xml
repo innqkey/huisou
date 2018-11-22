@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.TradeCustomerPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.TradeCustomerPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="bigid" jdbcType="INTEGER" property="bigid" />
+    <result column="bigcontact" jdbcType="VARCHAR" property="bigcontact" />
+    <result column="bigphone" jdbcType="VARCHAR" property="bigphone" />
+    <result column="bigcompanyname" jdbcType="VARCHAR" property="bigcompanyname" />
+    <result column="bigprovince" jdbcType="VARCHAR" property="bigprovince" />
+    <result column="bigcity" jdbcType="VARCHAR" property="bigcity" />
+    <result column="bigarea" jdbcType="VARCHAR" property="bigarea" />
+    <result column="bigaddress" jdbcType="VARCHAR" property="bigaddress" />
+    <result column="bigcontstatus" jdbcType="INTEGER" property="bigcontstatus" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="bigremark" jdbcType="VARCHAR" property="bigremark" />
+    <result column="createBy" jdbcType="INTEGER" property="createby" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateBy" jdbcType="INTEGER" property="updateby" />
+    <result column="updateDate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+ 	<select id="listAll" resultMap="BaseResultMap" parameterType="Map">
+ 		select *
+ 		from crm_trade_customer
+ 		<where>
+ 			<if test="bigcontact != null and bigcontact !=''">
+  				bigcontact like CONCAT('%', #{bigcontact},'%')
+  			</if>
+  			<if test="bigphone != null and bigphone !='' ">
+  				and bigphone = #{bigphone}
+  			</if>
+  			<if test="saleid != null and saleid !='' ">
+  				and saleid = #{saleid}
+  			</if>
+  		</where>
+ 	</select>
+
+</mapper>

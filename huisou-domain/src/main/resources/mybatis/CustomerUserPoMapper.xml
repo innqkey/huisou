@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.CustomerUserPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.CustomerUserPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="custuserid" jdbcType="INTEGER" property="custuserid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+	<select id="selectCustomerUserPo" resultType="com.huisou.vo.CustomerUserVo">
+		SELECT
+			t1.contact,
+			t1.phone,
+			t1.custid,
+			t2.custuserid,
+			t2.phone username,
+			t2.`password`
+		FROM
+			crm_customer t1
+		LEFT JOIN crm_customer_user t2 ON t1.custid = t2.custid
+		<where>
+			<if test="contact != null and contact != ''">
+				and t1.contact like CONCAT('%',#{contact},'%')
+			</if>
+			<if test="phone != null and phone != ''">
+				and t1.phone like CONCAT('%',#{phone},'%')
+			</if>
+			<if test="custuserid != null and custuserid != ''">
+				and t2.custuserid like CONCAT('%',#{custuserid},'%')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectCustomerUserPoBySaleid" resultType="com.huisou.vo.CustomerUserVo">
+			SELECT
+			t1.contact,
+			t1.phone,
+			t1.custid,
+			t2.custuserid,
+			t2.phone username,
+			t2.`password`
+		FROM
+			crm_customer t1
+		LEFT JOIN crm_customer_user t2 ON t1.custid = t2.custid
+		<where>
+			<if test="contact != null and contact != ''">
+				and t1.contact like CONCAT('%',#{contact},'%')
+			</if>
+			<if test="phone != null and phone != ''">
+				and t1.phone like CONCAT('%',#{phone},'%')
+			</if>
+			<if test="custuserid != null and custuserid != ''">
+				and t2.custuserid like CONCAT('%',#{custuserid},'%')
+			</if>
+			<if test="saleid != null and saleid != ''">
+				and t1.saleid=#{saleid}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateStatus" parameterType="java.lang.Integer">
+		UPDATE
+		crm_customer_user
+		SET
+		status = #{status}
+		WHERE
+		custuserid = #{custuserid}
+	</update>
+
+  
+  	<select id="selectCustomerUser" parameterType="java.lang.Integer" resultType="com.huisou.po.CustomerUserPo">
+  		SELECT * FROM crm_customer_user WHERE custuserid=#{custuserid}
+  	</select>
+  	
+  	<select id="findByCustid" parameterType="java.lang.Integer" resultType="com.huisou.po.CustomerUserPo">
+  		SELECT * FROM crm_customer_user WHERE custid=#{custid}
+  	</select>
+  	<update id="updateCustomerUser">
+  		UPDATE crm_customer_user
+		SET phone = #{phone},
+		    PASSWORD = #{password}
+		WHERE
+			custuserid = #{custuserid}
+  	</update>
+  	
+  	<insert id="add">
+  		INSERT INTO `crm_customer_user` (
+			`custid`,
+			`contact`,
+			`phone`,
+			`password`,
+			`status`,
+			`createdate`
+		)
+		VALUES
+			(
+			 #{custid},
+			 #{contact},
+			 #{phone},
+			 #{password},
+			 1,
+			 #{createdate}
+			)
+  	</insert>
+  	<select id="selectByContactAndPhone" resultType="com.huisou.po.CustomerUserPo">
+  		SELECT * FROM crm_customer_user WHERE phone=#{phone}
+  	</select>
+</mapper>

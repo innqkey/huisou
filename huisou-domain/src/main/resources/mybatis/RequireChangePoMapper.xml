@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.RequireChangePoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.RequireChangePo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="requirechangeid" jdbcType="INTEGER" property="requirechangeid" />
+   	<result column="requireid" jdbcType="INTEGER" property="requireid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="changenum" jdbcType="INTEGER" property="changenum" />
+    <result column="changetype" jdbcType="INTEGER" property="changetype" />
+    <result column="dealstatus" jdbcType="INTEGER" property="dealstatus" />
+    <result column="dealcontent" jdbcType="VARCHAR" property="dealcontent" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  <select id="findRecentlyChangePo" parameterType="java.lang.Integer" resultType="com.huisou.po.RequireChangePo">
+  		SELECT * FROM crm_item_require_change WHERE itemid=#{itemid} AND createdate=(SELECT MAX(createdate) FROM crm_item_require_change WHERE itemid=#{itemid}) LIMIT 1
+  </select>
+  
+  
+  <select id="serarch"  resultType="com.huisou.vo.RequireChangeVo">
+		SELECT
+			t1.*, 
+			t5.itemname,
+			t5.custstatus,
+			t5.status,
+			t5.itemtype,
+			t5.itemtypedetail,
+			t5.contact,
+			t5.phone,
+			t5.companyname,
+			t5.province,
+			t5.city,
+			t5.area,
+			t5.address,
+			t5.salename
+		FROM
+			crm_item_require_change t1
+		LEFT JOIN (
+			SELECT
+				t2.itemid,
+				t2.itemname,
+				t2.status,
+				t3.custstatus,
+				t2.itemtype,
+				t2.itemtypedetail,
+				t3.contact,
+				t3.phone,
+				t3.companyname,
+				t3.province,
+				t3.city,
+				t3.area,
+				t3.address,
+				t4.salename,
+				t4.saleid
+			FROM
+				crm_items t2
+			LEFT JOIN crm_customer t3 ON t2.custid = t3.custid
+			LEFT JOIN crm_salesman t4 ON t2.saleid = t4.saleid
+		) t5 ON t1.itemid = t5.itemid
+		
+			<where>
+			<if test="phone!=null and phone!=''">
+				and t5.phone  like CONCAT('%',#{phone},'%')
+			</if>
+			<if test="contact!=null and contact!=''">
+				and t5.contact  like CONCAT('%',#{contact},'%')
+			</if>
+			<if test="itemname!=null and itemname!=''">
+				and t5.itemname  like CONCAT('%',#{itemname},'%')
+			</if>
+			<if test="salename!=null and salename!=''">
+				and t5.salename  like CONCAT('%',#{salename},'%')
+			</if>
+			<if test="saleid!=null and saleid==0">
+				and t5.saleid  = #{saleid}
+			</if>
+			<if test="beginDate!=null and beginDate!=''">
+				and t1.createdate &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				and t1.createdate &lt;= #{endDate}
+			</if>
+			<if test="itemtype!=null and itemtype!=0">
+				and t5.itemtype  = #{itemtype}
+			</if>
+			<if test="1==1">
+				and t1.dealstatus = 0
+			</if>
+			</where>
+  		ORDER BY
+			t1.createdate DESC
+  </select>
+  
+  <update id="updateDealstatus" parameterType="java.lang.Integer">
+  		UPDATE crm_item_require_change  SET dealstatus=1 WHERE requirechangeid=#{requirechangeid}
+  </update>
+</mapper>

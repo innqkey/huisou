@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.NoticePoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.NoticePo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="noticeid" jdbcType="INTEGER" property="noticeid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="noticetype" jdbcType="INTEGER" property="noticetype" />
+    <result column="noticemessage" jdbcType="VARCHAR" property="noticemessage" />
+    <result column="noticeacceptype" jdbcType="INTEGER" property="noticeacceptype" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+  </resultMap>
+  <!-- 多条件查找消息提醒事件  -->
+  	<select id="queryAllNotices" resultMap="BaseResultMap">
+  		select *
+  		from crm_notice s
+  		where 1=1
+        <if test="noticeacceptype != null and noticeacceptype != ''">
+            and noticeacceptype = #{noticeacceptype,jdbcType=INTEGER}
+        </if>
+  		ORDER BY s.createdate ASC
+  	</select>
+  	<select id="selectAllByList" parameterType="java.util.List" resultMap="BaseResultMap" >
+  		select *
+  		from crm_notice s
+  		where s.itemid in 
+  		<foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+  			<if test="item!=null">
+  				#{item}
+  			</if>
+  		</foreach>
+  		ORDER BY  s.createdate ASC
+  </select>
+</mapper>

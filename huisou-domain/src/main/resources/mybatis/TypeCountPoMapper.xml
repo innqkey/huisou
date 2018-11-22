@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.TypeCountPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.ItemsPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="itembegindate" jdbcType="TIMESTAMP" property="itembegindate" />
+    <result column="itemenddate" jdbcType="TIMESTAMP" property="itemenddate" />
+    <result column="itemstatus" jdbcType="INTEGER" property="itemstatus" />
+    <result column="contnum" jdbcType="VARCHAR" property="contnum" />
+    <result column="itemrequire" jdbcType="VARCHAR" property="itemrequire" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="tradetype" jdbcType="INTEGER" property="tradetype" />
+    <result column="auditstatus" jdbcType="INTEGER" property="auditstatus" />
+  </resultMap>
+  
+	  <select id="itemTypeCount" resultType="map">
+	  		SELECT
+			itemtype,
+			COUNT(itemtype) AS count
+			FROM
+			crm_items
+			WHERE 1=1
+	        GROUP BY itemtype
+	  </select>
+	  
+	  <select id="itemTypeCountBySaleId" parameterType="java.lang.Integer" resultType="map">
+	  		SELECT
+			itemtype,
+			COUNT(itemtype) AS count
+			FROM
+			crm_items
+			WHERE 1=1
+				<if test="saleid != null and saleid !=''">
+	  				and saleid = #{saleid}
+	  			</if>
+	        GROUP BY itemtype
+	  </select>
+	  
+	  <select id="contactTypeCount" resultType="map">
+	  		SELECT
+			relatecontstatus,
+			COUNT(relatecontstatus) AS count
+			FROM
+			crm_items
+			WHERE 1=1
+	        GROUP BY relatecontstatus
+	  </select>
+	  
+	  <select id="contactTypeCountBySaleId" parameterType="java.lang.Integer" resultType="map">
+	  		SELECT
+			relatecontstatus,
+			COUNT(relatecontstatus) AS count
+			FROM
+			crm_items
+			WHERE 1=1
+				<if test="saleid != null and saleid !=''">
+	  				and saleid = #{saleid}
+	  			</if>
+	        GROUP BY relatecontstatus
+	  </select>
+  
+
+</mapper>

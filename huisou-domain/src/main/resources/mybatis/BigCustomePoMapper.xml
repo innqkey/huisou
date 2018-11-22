@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.BigCustomePoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.BigCustomePo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="bigid" jdbcType="INTEGER" property="bigid" />
+    <result column="bigcontact" jdbcType="VARCHAR" property="bigcontact" />
+    <result column="bigphone" jdbcType="VARCHAR" property="bigphone" />
+    <result column="bigcompanyname" jdbcType="VARCHAR" property="bigcompanyname" />
+    <result column="bigprovince" jdbcType="VARCHAR" property="bigprovince" />
+    <result column="bigcity" jdbcType="VARCHAR" property="bigcity" />
+    <result column="bigarea" jdbcType="VARCHAR" property="bigarea" />
+    <result column="bigaddress" jdbcType="VARCHAR" property="bigaddress" />
+    <result column="bigcontstatus" jdbcType="INTEGER" property="bigcontstatus" />
+    <result column="bigsalestatus" jdbcType="INTEGER" property="bigsalestatus" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />   
+    <result column="evaluationtype" jdbcType="INTEGER" property="evaluationtype" />
+    <result column="bigremark" jdbcType="VARCHAR" property="bigremark" />
+    <result column="createBy" jdbcType="INTEGER" property="createby" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateBy" jdbcType="INTEGER" property="updateby" />
+    <result column="updateDate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  	
+  	<!-- 多条件查找  -->
+  	<select id="selectByBigCusParas"  parameterType="Map" resultMap="BaseResultMap">
+  		select *
+  		from crm_big_customer s
+  		where 1=1
+  		<if test="bigcontact != null and bigcontact !=''">
+  			and bigcontact like CONCAT('%', #{bigcontact},'%')
+  		</if>
+  		<if test="bigphone != null and bigphone !='' ">
+  			and bigphone like CONCAT(#{bigphone},'%')
+  		</if>
+  		<if test="bigcontstatus != null and bigcontstatus != '' ">
+  			and bigcontstatus = #{bigcontstatus}
+  		</if>
+  		<if test="bigsalestatus != null and bigsalestatus !='' ">
+  			and bigsalestatus = #{bigsalestatus}
+  		</if> 
+  		<if test="saleid != null and saleid !='' ">
+  			and saleid = #{saleid}
+  		</if>
+  		ORDER BY s.createDate DESC
+  	</select>
+  	
+  	<!-- 根据bigids批量操作  java.util.ArrayList-->
+  	<update id="updateAllocatedCusStatus" parameterType="Map">
+  		UPDATE crm_big_customer
+  		 <trim prefix="set" suffixOverrides=",">
+  		 	<if test="bigsalestatus != null">bigsalestatus=#{bigsalestatus},</if>
+ 			<if test="saleid != null">saleid=#{saleid},</if>
+		  	<if test="salename != null and salename != '' ">salename=#{salename},</if>
+	 	</trim>
+        <where>
+            bigid  
+            <foreach  collection="bigids" item="id" open="in (" close=")" separator=",">   
+                #{id}  
+            </foreach>
+        </where>   
+  	</update>
+  	
+  	<insert id="addBatchList" parameterType="java.util.ArrayList" useGeneratedKeys="true"
+            keyProperty="bigid">
+        insert into crm_big_customer (bigcontact, bigphone, bigcompanyname, bigprovince, bigcity, bigarea, bigaddress, createBy, createDate) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.bigcontact,jdbcType=VARCHAR}, #{item.bigphone,jdbcType=VARCHAR}, #{item.bigcompanyname,jdbcType=VARCHAR},
+            #{item.bigprovince,jdbcType=VARCHAR},#{item.bigcity,jdbcType=VARCHAR},#{item.bigarea,jdbcType=VARCHAR},
+            #{item.bigaddress,jdbcType=VARCHAR},#{item.createby,jdbcType=INTEGER},#{item.createdate,jdbcType=TIMESTAMP})
+   		</foreach>
+   </insert>
+</mapper>

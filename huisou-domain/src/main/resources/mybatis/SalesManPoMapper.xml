@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.SalesManPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.SalesManPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="salephone" jdbcType="VARCHAR" property="salephone" />
+    <result column="saleweixin" jdbcType="VARCHAR" property="saleweixin" />
+    <result column="saleemail" jdbcType="VARCHAR" property="saleemail" />
+    <result column="salestatus" jdbcType="INTEGER" property="salestatus" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  <sql id="selectSale">
+	select
+   s.saleid,
+   s.salename, 
+   s.salephone, 
+   s.saleweixin, 
+   s.saleemail, 
+   s.salestatus , 
+  count(c.custid) customers 
+   from crm_salesman s
+   	LEFT JOIN	crm_customer c
+   		ON s.saleid=c.saleid
+group by    s.saleid,
+   s.salename, 
+   s.salephone, 
+   s.saleweixin, 
+   s.saleemail, 
+   s.salestatus
+   ORDER BY s.createdate DESC
+  </sql>
+  <select id="findAllMap" resultType="map">
+  <include refid="selectSale"></include>
+  </select>
+  
+  <select id="findSaleById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		select *  from crm_salesman where saleid=#{beforesaleid}
+  </select>
+  
+  <select id="findSale"  resultType="map">
+ 	select
+   s.saleid,
+   s.salename, 
+   s.salephone, 
+   s.saleweixin, 
+   s.saleemail, 
+   s.salestatus , 
+  count(c.custid) customers 
+   from crm_salesman s
+   	LEFT JOIN	crm_customer c
+   		ON s.saleid=c.saleid
+ 	<where>
+ 		<if test="salename!=null and salename!=''">
+  		 and s.salename like CONCAT('%',#{salename},'%')
+  		</if>
+  		<if test="salephone!=null and salephone!=''">
+  		and s.salephone like CONCAT('%',#{salephone},'%')
+  		</if>
+  		<if test="startTime!=null">
+  		and s.createdate &gt;= #{startTime}
+  		</if>
+  		<if test="endTime!=null">
+  		and s.createdate &lt;= #{endTime}
+  		</if>
+  		</where>
+  		group by    s.saleid,
+   s.salename, 
+   s.salephone, 
+   s.saleweixin, 
+   s.saleemail, 
+   s.salestatus
+  		ORDER BY s.createdate DESC
+  </select>
+  
+  <select id="findSaleBySalephone" parameterType="String" resultType="com.huisou.po.SalesManPo">
+  select * from crm_salesman where salephone=#{salephone}
+  </select>
+  
+  <update id="update" parameterType="com.huisou.po.SalesManPo">
+      update crm_salesman 
+  <set>
+  <if test="salename != null and salename!=''">
+  	salename=#{salename},
+  </if>
+  <if test="salephone != null and salephone!=''">
+  	salephone=#{salephone},
+  </if>
+  <if test="saleweixin != null">
+  	saleweixin=#{saleweixin},
+  </if>
+  <if test="saleemail != null">
+  	saleemail=#{saleemail},
+  </if>
+  <if test="salestatus != null">
+  	salestatus=#{salestatus},
+  </if>
+  <if test="createby != null">
+  	createby=#{createby},
+  </if>
+   <if test="createdate != null">
+  	createdate=#{createdate},
+  </if> 
+  <if test="updateby != null">
+  	updateby=#{updateby},
+  </if>
+   <if test="updatedate != null">
+  	updatedate=#{updatedate},
+  </if>
+  </set>
+  where saleid=#{saleid}
+  </update>
+  
+  
+  <insert id="insertSelectKey" parameterType="com.huisou.po.SalesManPo" useGeneratedKeys="true" keyProperty="saleid" >
+  	INSERT INTO crm_salesman (salename, salephone, saleweixin, saleemail, salestatus, createby, createdate) VALUES (#{salename}, #{salephone}, #{saleweixin}, #{saleemail}, #{salestatus}, #{createby}, #{createdate})
+  	
+  </insert>
+  
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.TradeCecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.TradeCecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="tradeid" jdbcType="INTEGER" property="tradeid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="advancemoney" jdbcType="DECIMAL" property="advancemoney" />
+    <result column="tradeway" jdbcType="INTEGER" property="tradeway" />
+    <result column="payaccount" jdbcType="VARCHAR" property="payaccount" />
+    <result column="evaluationtype" jdbcType="INTEGER" property="evaluationtype" />
+    <result column="tradedate" jdbcType="VARCHAR" property="tradedate" />
+    <result column="tradetype" jdbcType="INTEGER" property="tradetype" />
+    <result column="voucherno" jdbcType="VARCHAR" property="voucherno" />
+    <result column="traderemarks" jdbcType="VARCHAR" property="traderemarks" />
+    <result column="audituserid" jdbcType="INTEGER" property="audituserid" />
+    <result column="auditusername" jdbcType="VARCHAR" property="auditusername" />
+    <result column="auditstatus" jdbcType="INTEGER" property="auditstatus" />
+    <result column="auditremarks" jdbcType="VARCHAR" property="auditremarks" />
+    <result column="auditdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="traderemarks" jdbcType="VARCHAR" property="traderemarks" />
+    
+  </resultMap>
+  
+  <resultMap id="TradeResultMap" type="com.huisou.vo.TradeVo">
+ 	<result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="itemtypename" jdbcType="VARCHAR" property="itemtypename" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="weixin" jdbcType="VARCHAR" property="weixin" />
+    <result column="tradeway" jdbcType="INTEGER" property="tradeway" />
+    <result column="tradewayname" jdbcType="VARCHAR" property="tradewayname" />
+    <result column="tradetype" jdbcType="INTEGER" property="tradetype" />
+    <result column="tradetypename" jdbcType="VARCHAR" property="tradetypename" />
+    <result column="tradedate" jdbcType="VARCHAR" property="tradedate" />
+    <result column="voucherno" jdbcType="VARCHAR" property="voucherno" />
+    <result column="traderemarks" jdbcType="VARCHAR" property="traderemarks" />
+  </resultMap>
+  
+  <select id="findTradeReByParasAndUnviersalPo" parameterType="java.lang.Integer" resultType="UniversalPo">
+  	select * from crm_trade_record where itemid=#{itemid}
+  	order by updatedate desc
+  </select>
+  
+  <select id="findTradeLastByParas" parameterType="com.huisou.po.TradeCecordPo" resultType="com.huisou.vo.TradeCecordVo">
+  	select * from crm_trade_record where itemid=#{itemid} and tradetype=#{tradetype}
+  	order by updatedate desc
+  	limit 1
+  </select>
+  <select id="findAllMap" resultMap="TradeResultMap" parameterType="com.huisou.po.TradeCecordPo">
+  	select i.itemid,i.itemname,i.itemtype,c.contact,c.weixin,c.phone,r.tradeway,r.tradedate,r.tradetype,r.voucherno,r.auditstatus,r.traderemarks from crm_trade_record r
+		LEFT JOIN crm_items i on r.itemid = i.itemid
+		LEFT JOIN crm_customer c on r.custid = c.custid
+		<where>
+			<if test="tradetype != null">
+		    	r.tradetype = #{tradetype,jdbcType=INTEGER}
+		    </if>
+		    <if test="auditstatus != null and (auditstatus == 0 or auditstatus==1 or auditstatus == 2)">
+		    	and r.auditstatus = #{auditstatus,jdbcType=INTEGER}
+		    </if>
+		    <if test="auditstatus != null and auditstatus == 3">
+		    	and r.auditstatus != 0
+		    </if>
+		    <!-- <![CDATA[ group by r.itemid,r.tradetype ]]> -->
+		    <![CDATA[ ORDER BY r.updatedate desc ]]>
+		</where>
+  </select>
+ 
+</mapper>

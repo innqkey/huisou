@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.CustomerPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.CustomerPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="weixin" jdbcType="VARCHAR" property="weixin" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="idcard" jdbcType="VARCHAR" property="idcard" />
+    <result column="companyname" jdbcType="VARCHAR" property="companyname" />
+    <result column="companyintro" jdbcType="VARCHAR" property="companyintro" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="custstatus" jdbcType="INTEGER" property="custstatus" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+    <result column="relatecustid" jdbcType="INTEGER" property="relatecustid" />
+    <result column="custremark" jdbcType="VARCHAR" property="custremark" />
+  </resultMap>
+   <sql id="selectsql">
+	SELECT
+  			t1.province,
+  			t1.area,
+  			t1.city,
+			t1.custid,
+			t1.contact,
+			t1.phone,
+			t1.weixin,
+			t1.email,
+			t1.address,
+			t1.custstatus,
+			t3.itemid,
+			t3.itemname,
+			t3.standby2,
+			t3.standby4,
+			t3.itemtype,
+			t3.itemtypedetail,
+			t3.itemenddate,
+			t3.auditstatus,
+			t3.relatecontstatus,
+			t3.tradetype,
+			t3.commitstatus,
+			t3.itembegindate,
+			t2.saleid,
+			t2.salename,
+			t1.companyname,
+			t3.standby3,
+			t3.status,
+			t1.replaceusername,
+			(select DISTINCT m.itemid > 0 from crm_renew_mark m where m.itemid =t3.itemid) markstatus
+		FROM
+			crm_items t3
+		LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+		LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+  </sql>
+  
+  <insert id="insertCustomerReturnId" parameterType="CustomerPo" useGeneratedKeys="true" keyProperty="customerPo.custid">
+		INSERT INTO `crm_customer`
+		(
+			contact,
+			phone,
+			weixin,
+			email,
+			custremark,
+			idcard,
+			companyname,
+			companyintro,
+			province,
+			city,
+			area,
+			address,
+			<if test="customerPo.custstatus!=null and customerPo.custstatus!=''">
+				custstatus,
+			</if>
+			saleid,
+			createby,
+			createdate,
+			updateby,
+			evaluate,
+			replaceuserid,
+			<if test="customerPo.relatecustid!=null and customerPo.relatecustid!=''">
+				relatecustid,
+			</if>
+			replaceusername
+		)
+VALUES
+	(
+		
+		#{customerPo.contact},
+		#{customerPo.phone},
+		#{customerPo.weixin},
+		#{customerPo.email},
+		#{customerPo.custremark},
+		#{customerPo.idcard},
+		#{customerPo.companyname},
+		#{customerPo.companyintro},
+		#{customerPo.province},
+		#{customerPo.city},
+		#{customerPo.area},
+		#{customerPo.address},
+		<if test="customerPo.custstatus!=null and customerPo.custstatus!=''">
+			#{customerPo.custstatus},
+		</if>
+		#{customerPo.saleid},
+		#{customerPo.createby},
+		#{customerPo.createdate},
+		#{customerPo.updateby},
+		#{customerPo.evaluate},
+		#{customerPo.replaceuserid},
+		<if test="customerPo.relatecustid!=null and customerPo.relatecustid!=''">
+			#{customerPo.relatecustid},
+		</if>
+		#{customerPo.replaceusername}
+	);  		
+
+  </insert>
+	<select id="selectcountByItemTradetype" resultType="java.lang.Integer">
+		select count(*) from crm_items t3 where 1=1
+		<if test="saleid!=null  and saleid!=''">
+			and t3.saleid=#{saleid}
+		</if> 
+		<if test="tradetype!=null and tradetype!=''">
+			and t3.tradetype=#{tradetype}
+		</if>
+		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+		<if test="pendingflag != null and pendingflag != ''">
+			<if test="pendingflag==1 or  pendingflag=='1'">
+				And t3.markstatus=1
+			</if>
+			<if test="pendingflag==0 or  pendingflag=='0'">
+				And t3.markstatus=0
+			</if>
+		</if>
+	</select>  
+
+  
+  <select id="searchCustomerViaCondition" parameterType="java.lang.String" statementType="STATEMENT" resultType="UniversalPo">
+		<include refid="selectsql"></include> 
+		where 1=1
+		<if test="condition!=null and condition!='' and content!='' and content!=null">
+			and t1.${condition} like CONCAT('%','${content}','%' )
+		</if>
+		<if test="custstatus!=null and custstatus!=''">
+				and t1.custstatus=${custstatus}
+		</if>
+		<if test="saleid!=null and saleid!=''">
+			And t2.saleid=${saleid}
+		</if>
+		ORDER BY  t3.createdate desc
+  </select>
+  
+
+  <select id="findInfosByList" resultType="UniversalPo" parameterType="java.util.ArrayList">
+  			<include refid="selectsql"/>
+  			where t3.itemid in 
+  			<foreach  collection="itemids" index="index" item="item" separator="," open="(" close=")">
+  			<if test="item!=null">
+  				#{item}
+  			</if>
+  		</foreach>
+  		ORDER BY  t3.createdate desc
+  </select>
+  
+  <select id="findRenewCustomerAll"  resultType="UniversalPo">
+  		<include refid="selectsql"></include> 
+  		where  TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;#{date}  
+  			AND t3.itemenddate &gt; NOW()
+  		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+  		ORDER BY  t3.createdate desc
+  </select>
+  
+  <select id="findRenewCustomerBysaid" resultType="UniversalPo">
+  			<include refid="selectsql"></include> 
+  		where  TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;#{date} 
+	  		 AND t3.itemenddate &gt; NOW()
+	  		 AND t2.saleid=#{saleid}  
+  		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+  		ORDER BY  t3.createdate desc
+  </select>
+  
+  <select id="findRenewCustomerAll2" resultType="UniversalPo">
+  			SELECT
+	  		t1.province,
+	  		t1.area,
+	  		t1.city,
+			t1.custid,
+			t1.contact,
+			t1.phone,
+			t1.weixin,
+			t1.email,
+			t1.address,
+			t1.custstatus,
+			t3.itemid,
+			t3.itemname,
+			t3.standby2,
+			t3.standby4,
+			t3.itemtype,
+			t3.itemtypedetail,
+			t3.itemenddate,
+			t3.auditstatus,
+			t3.relatecontstatus,
+			t3.tradetype,
+			t3.commitstatus,
+			t3.itembegindate,
+			t2.saleid,
+			t2.salename,
+			t1.companyname,
+			t3.standby3,
+			t1.replaceusername,
+			t6.petname,
+			t6.serremark,
+			(
+				SELECT
+					count(t.traceid)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = t3.itemid
+			) tracenum,
+			(
+				SELECT
+					max(t.custrenewstatus)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = t3.itemid
+			) custrenewstatus,
+			(select DISTINCT m.itemid > 0 from crm_renew_mark m where m.itemid =t3.itemid) markstatus
+		FROM
+			 crm_items t3
+		LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+		LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+		LEFT JOIN crm_renew_mark m ON t3.itemid = m.itemid
+		LEFT JOIN (SELECT t4.*,t5.petname FROM crm_service_renew t4, crm_user t5 WHERE t4.userid = t5.userid) t6 ON t3.itemid = t6.itemid
+  		where  TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;#{date} 
+  		 <if test='searchValue!=null and searchValue!=""'>
+			and  ( m.companyname like CONCAT('%','${searchValue}','%') 
+			or m.itemname like CONCAT('%','${searchValue}','%' )
+			or m.contact like  CONCAT('%','${searchValue}','%' ) 
+			or m.salename LIKE CONCAT('%','${searchValue}', '%'))
+		</if>  
+  		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+		<if test="itemType != null and itemType != ''">
+			AND m.itemtype =#{itemType}
+		</if>
+  		ORDER BY  t3.createdate desc
+  </select>
+  
+   <select id="findRenewCustomerByuserid" resultType="UniversalPo">
+  			SELECT
+	  		t1.province,
+	  		t1.area,
+	  		t1.city,
+			t1.custid,
+			t1.contact,
+			t1.phone,
+			t1.weixin,
+			t1.email,
+			t1.address,
+			t1.custstatus,
+			t3.itemid,
+			t3.itemname,
+			t3.standby2,
+			t3.standby4,
+			t3.itemtype,
+			t3.itemtypedetail,
+			t3.itemenddate,
+			t3.auditstatus,
+			t3.relatecontstatus,
+			t3.tradetype,
+			t3.commitstatus,
+			t3.itembegindate,
+			t2.saleid,
+			t2.salename,
+			t1.companyname,
+			t3.standby3,
+			t1.replaceusername,
+			t6.petname,
+			t6.serremark,
+			(
+				SELECT
+					count(t.traceid)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = t3.itemid
+			) tracenum,
+			(
+				SELECT
+					max(t.custrenewstatus)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = t3.itemid
+			) custrenewstatus,
+			(select DISTINCT m.itemid > 0 from crm_renew_mark m where m.itemid =t3.itemid) markstatus
+		FROM
+			 crm_items t3
+		LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+		LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+		LEFT JOIN crm_renew_mark m ON t3.itemid = m.itemid
+		LEFT JOIN (SELECT t4.*,t5.petname FROM crm_service_renew t4, crm_user t5 WHERE t4.userid = t5.userid) t6 ON t3.itemid = t6.itemid
+  		where  TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;#{date} 
+	  		 AND t6.userid = #{userid}
+	  	<if test='searchValue!=null and searchValue!=""'>
+			and  ( m.companyname like CONCAT('%','${searchValue}','%') 
+			or m.itemname like CONCAT('%','${searchValue}','%' )
+			or m.contact like  CONCAT('%','${searchValue}','%' ) 
+			or m.salename LIKE CONCAT('%','${searchValue}', '%'))
+		</if>
+  		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+		<if test="itemType != null and itemType != ''">
+			AND m.itemtype =#{itemType}
+		</if>
+  		ORDER BY  t3.createdate desc
+  </select>
+  
+  <select id="findCountBySaleid" resultType="java.lang.Integer">
+  				SELECT
+  				count(*)
+		FROM
+			crm_items t3
+		LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+		LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+		where  TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;#{timeSpan}  
+			AND t3.itemenddate &gt; NOW()
+		<if test="saleid!=null">
+			AND t2.saleid=#{saleid}
+		</if>
+		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+  </select>
+  
+  <select id="findDetailedInfoByitemid" resultType="UniversalPo" parameterType="java.lang.Integer">
+  		SELECT
+  		t1.custid,
+  		t1.contact,
+  		t1.phone,
+  		t1.weixin,
+  		t1.email,
+  		t1.custremark,
+  		t1.idcard,
+  		t1.companyname,
+  		t1.companyintro,
+  		t1.province,
+  		t1.city,
+  		t1.area,
+  		t1.address,
+  		t1.custstatus,
+  		t1.evaluate,
+		t2.*,
+		t3.itemid,
+		t3.itemname,
+		t3.itemtype,
+		t3.itemtypedetail,
+		t3.contnum,
+		t3.itemrequire,
+		t3.itembegindate,
+		t3.itemenddate,
+		t3.allmoney,
+		t3.developmoney,
+		t3.servicemoney,
+		t3.standby4,
+		t3.relatecontstatus,
+		t1.replaceuserid,
+		t1.replaceusername
+		FROM
+			crm_items t3
+		LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+		LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid WHERE t3.itemid=#{itemid} ORDER BY  t3.createdate desc
+  </select>
+  
+  
+  
+  <update id="changCustomerStatus" parameterType="java.lang.Integer">
+  		update crm_customer  
+  			set custstatus=#{status}  
+  			where custid=#{custid}
+  </update>
+  
+  
+  
+  <update id="batchChangeCustomerStatus" parameterType="java.util.ArrayList">
+  		update crm_customer  
+  			set custstatus=#{custStatus}  
+  			where custid in
+  		<foreach  collection="custids" index="index" item="item" separator="," open="(" close=")">
+  			<if test="item!=null">
+  				#{item}
+  			</if>
+  		</foreach>
+  </update>
+ 
+  <select id="searchByConditionAndUsername" resultType="UniversalPo" statementType="STATEMENT" parameterType="java.lang.String">
+  		<include refid="selectsql"></include>
+  		 where 1=1
+		<if test='searchType!=null and searchType!="" and value!="" and value!=null and searchTable=="a"'>
+			AND t1.${searchType} like  CONCAT('%','${value}','%' )  
+		</if>
+		<if test='searchType!=null and searchType!="" and value!="" and value!=null and searchTable=="b"'>
+			 AND t3.${searchType} like CONCAT('%','${value}','%' )  
+		</if>
+		<!-- 用于手机端的搜索 -->
+		<if test='phonetype!=null and phonetype!=""  and phonetype=="1" and value!="" and value!=null'>
+			and  ( t1.phone like CONCAT('%','${value}','%') 
+			or t1.contact like  CONCAT('%','${value}','%' ) 
+			or t3.itemname like CONCAT('%','${value}','%' )
+			or t2.salename LIKE CONCAT('%','${value}', '%'))
+		</if>
+		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and t3.itembegindate >='${beginDate}' ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and t3.itembegindate<='${endDate}' ]]>
+		</if>
+		<if test='custstatus!=null and custstatus!=""'>
+			AND t1.custstatus =${custstatus}
+		</if>
+		<if test='saleid!=null and saleid!=""'>
+			AND t2.saleid =${saleid}
+		</if>
+		<if test='tradetype!=null and tradetype!=""'>
+			AND t3.tradetype =${tradetype}
+		</if>
+		<if test="salename != null and salename != ''">
+			AND t2.salename ='${salename}'
+		</if>
+		<if test="itemType != null and itemType != ''">
+			AND t3.itemtype =${itemType}
+		</if>
+		<if test="contractStatus != null and contractStatus != '' and contractStatus != 0">
+			AND t3.relatecontstatus =${contractStatus}
+		</if>
+		<if test="pendingflag != null and pendingflag != ''">
+			<if test="pendingflag==1 or  pendingflag=='1'">
+				And t3.markstatus=1
+			</if>
+			<if test="pendingflag==0 or  pendingflag=='0'">
+				And t3.markstatus=0
+			</if>
+		</if>
+		<if test="salenull != null and salenull != '' and salenull == 0">
+			<![CDATA[ AND t3.saleid = 0 ]]>
+		</if>
+		
+		<if test="overdue != null and overdue != ''">
+			AND t3.itemenddate &lt; NOW()
+		</if>
+		<if test='isrenew!=null  and isrenew!=""  and date!=null and date!=""'>
+			AND TO_DAYS(t3.itemenddate)-TO_DAYS(NOW()) &lt;${date}  
+		</if>
+		<if test="sortCondition == null or sortCondition == ''" >
+			<![CDATA[ ORDER BY  t3.itemid desc ]]>
+		</if>
+		<if test="sortCondition != null and sortCondition != ''" >
+			<if test="sortCondition==1">
+				<![CDATA[ ORDER BY  t3.createdate desc ]]>
+			</if>
+			<if test="sortCondition==2">
+				<![CDATA[ ORDER BY  t3.updatedate desc ]]>
+			</if>
+			<if test="sortCondition==3">
+				<![CDATA[ ORDER BY  t3.itembegindate desc ]]>
+			</if>
+			<if test="sortCondition==4">
+				<![CDATA[ ORDER BY  t3.itemenddate desc,t3.itembegindate desc ]]>
+			</if>
+		</if>
+		
+		<!-- <if test='orderby!=null and orderby=="custid"'>
+			<![CDATA[ ORDER BY t3.custid desc, t3.updatedate desc ]]>
+		</if>
+		itemType , contractStatus, sortCondition
+		<if test='orderby==null or orderby==""'>
+			<![CDATA[ ORDER BY  t3.updatedate desc ]]>
+		</if> -->
+		 
+  </select>
+  
+  <select id="findAllInfo"  statementType="STATEMENT" resultType="UniversalPo">
+	  		SELECT
+	  			t1.province,
+	  			t1.area,
+	  			t1.city,
+				t1.custid,
+				t1.contact,
+				t1.phone,
+				t1.weixin,
+				t1.email,
+				t1.address,
+				t1.custstatus,
+				t3.itemid,
+				t3.itemname,
+				t3.itemtype,
+				t3.itemenddate,
+				t2.saleid,
+				t2.salename,
+				t3.tradetype,
+				t3.auditstatus,
+				t3.commitstatus
+			FROM
+				crm_items t3
+			LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+			LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+  		<if test="tradetype!=null and tradetype!=''">
+  			where t3.tradetype=${tradetype}
+  		</if>
+		<![CDATA[ ORDER BY  t3.updatedate desc ]]>
+  		
+  </select>
+  <select id="findInfoUsername"  statementType="STATEMENT" parameterType="java.lang.String" resultType="UniversalPo">
+  			SELECT
+	  			t1.province,
+	  			t1.area,
+	  			t1.city,
+				t1.custid,
+				t1.contact,
+				t1.phone,
+				t1.weixin,
+				t1.email,
+				t1.address,
+				t1.custstatus,
+				t3.itemid,
+				t3.itemname,
+				t3.itemtype,
+				t3.itemenddate,
+				t2.saleid,
+				t2.salename,
+				t3.tradetype,
+				t3.auditstatus,
+				t3.commitstatus
+			FROM
+				crm_items t3
+			LEFT JOIN crm_customer t1 ON t3.custid=t1.custid
+			LEFT JOIN crm_salesman t2 ON t3.saleid = t2.saleid
+		  	  	where t3.saleid=${saleid}
+		    <if test="tradetype!=null and tradetype!=''">
+		  		  AND  t3.tradetype=${tradetype}
+		    </if>
+			<![CDATA[ ORDER BY  t3.updatedate desc ]]>
+  </select>
+  
+  <select id="countRelatecustid" resultType="java.lang.Integer">
+  	select count(custid) from crm_customer 
+	 where relatecustid>0
+  </select>
+  
+  <select id="selectByCustid" parameterType="java.lang.Integer" resultType="com.huisou.po.CustomerPo">
+  	select * from crm_customer where custid=#{custid}
+  </select>
+</mapper>

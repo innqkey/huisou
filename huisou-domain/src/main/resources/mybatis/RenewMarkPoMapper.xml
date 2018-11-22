@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.RenewMarkMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.RenewMarkPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="markid" jdbcType="INTEGER" property="markid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="itembegindate" jdbcType="TIMESTAMP" property="itembegindate" />
+    <result column="itemenddate" jdbcType="TIMESTAMP" property="itemenddate" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="companyname" jdbcType="VARCHAR" property="companyname" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+  </resultMap>
+  
+  <resultMap id="MarkVoResultMap" type="com.huisou.vo.RenewMarkVo">
+    <result column="markid" jdbcType="INTEGER" property="markid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="itembegindate" jdbcType="TIMESTAMP" property="itembegindate" />
+    <result column="itemenddate" jdbcType="TIMESTAMP" property="itemenddate" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="companyname" jdbcType="VARCHAR" property="companyname" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="tracenum" jdbcType="INTEGER" property="tracenum" />
+    <result column="custrenewstatus" jdbcType="INTEGER" property="custrenewstatus" />
+    <result column="petname" jdbcType="VARCHAR" property="petname" />
+  </resultMap>
+  <select id="selectMarkList" resultMap="MarkVoResultMap"  parameterType="java.util.Map">
+  		select 
+			m.*,(select count(t.traceid) from crm_renew_trace t where t.itemid = m.itemid) tracenum,
+			(select max(t.custrenewstatus) from crm_renew_trace t where t.itemid = m.itemid) custrenewstatus
+		from crm_renew_mark m
+		LEFT JOIN (select r.itemid,max(r.createdate) maxdate from crm_renew_trace r GROUP BY r.itemid) d on m.itemid = d.itemid
+		where 1=1
+		<if test='searchValue!=null and searchValue!=""'>
+			and  ( m.companyname like CONCAT('%','${searchValue}','%') 
+			or m.itemname like CONCAT('%','${searchValue}','%' )
+			or m.contact like  CONCAT('%','${searchValue}','%' ) 
+			or m.salename LIKE CONCAT('%','${searchValue}', '%'))
+		</if>
+		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and m.itembegindate >=#{beginDate} ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and m.itembegindate<=#{endDate} ]]>
+		</if>
+		<if test="itemType != null and itemType != ''">
+			AND m.itemtype =#{itemType}
+		</if>
+		<![CDATA[ order by d.maxdate desc,m.markid desc ]]>
+  </select>
+  
+  <select id="selectRenewSucList" resultMap="MarkVoResultMap"  parameterType="java.util.Map">
+  	<!-- 	select 
+			m.*,
+			(
+				SELECT
+					count(t.traceid)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = m.itemid
+			) tracenum,
+			(SELECT t5.petname FROM crm_service_renew t4, crm_user t5 WHERE t4.userid = t5.userid) petname
+		from crm_renew_mark m
+		LEFT JOIN crm_renew_trace r on m.itemid = r.itemid
+		where r.custrenewstatus = 1 -->
+		SELECT
+			m.*, 
+			n.itemtypedetail,
+			(
+				SELECT
+					count(t.traceid)
+				FROM
+					crm_renew_trace t
+				WHERE
+					t.itemid = m.itemid
+			) tracenum,
+			t6.petname
+		FROM
+			crm_renew_mark m
+		LEFT JOIN crm_renew_trace r ON m.itemid = r.itemid
+		LEFT JOIN (
+				SELECT
+		      t4.itemid,
+					t5.petname
+				FROM
+					crm_service_renew t4,
+					crm_user t5
+				WHERE
+					t4.userid = t5.userid
+			) t6 ON t6.itemid = m.itemid
+			LEFT JOIN crm_items n ON n.itemid = m.itemid
+		WHERE
+			r.custrenewstatus = 1
+		<if test='searchValue!=null and searchValue!=""'>
+			and  ( m.companyname like CONCAT('%','${searchValue}','%') 
+			or m.itemname like CONCAT('%','${searchValue}','%' )
+			or m.contact like  CONCAT('%','${searchValue}','%' ) 
+			or m.salename LIKE CONCAT('%','${searchValue}', '%'))
+		</if>
+		<if test='beginDate !=null and beginDate!="" '>
+			<![CDATA[ and m.itembegindate >=#{beginDate} ]]>
+		</if>
+		<if test='endDate !=null and endDate!="" '>
+			<![CDATA[ and m.itembegindate<=#{endDate} ]]>
+		</if>
+		<if test="itemType != null and itemType != ''">
+			AND m.itemtype =#{itemType}
+		</if>
+		<![CDATA[ order by r.createdate desc ]]>
+  </select>
+  
+</mapper>

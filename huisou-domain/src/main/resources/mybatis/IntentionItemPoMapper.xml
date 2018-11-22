@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.IntentionItemPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.IntentionItemPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="intentionitemid" jdbcType="INTEGER" property="intentionitemid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="itemtype" jdbcType="INTEGER" property="itemtype" />
+    <result column="intentioncustid" jdbcType="INTEGER" property="intentioncustid" />
+   	<result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="courseid" jdbcType="INTEGER" property="courseid" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+ 
+ 	<select id="selectByParams" parameterType="java.lang.Integer" resultType="com.huisou.vo.ItemCourseVo">
+		SELECT
+			t.*,
+			t1.coursename,
+			t1.courseaddress
+		FROM
+			crm_intention_item t
+		LEFT JOIN crm_training_course t1 ON t.courseid = t1.courseid
+		WHERE 1=1 
+ 			<if test="intentioncustid!=null">
+ 				and t.intentioncustid=#{intentioncustid}
+ 			</if>
+ 			<if test="courseid != null">
+ 				and t.courseid=#{courseid}
+ 			</if>
+ 			<if test="createby != null">
+ 				and t.createby=#{createby}
+ 			</if>
+ 		ORDER BY
+ 		t.createdate DESC
+ 	</select>
+ 	
+ 	<update id="updateItemCourseId" parameterType="java.lang.Integer">
+  	 	update crm_intention_item
+		set courseid = #{courseid}
+		where 1=1
+		<if test="createby !=null and createby !=''">
+    		and createby=#{createby} 
+		</if>
+		<if test="intentioncustid !=null and intentioncustid !=''">
+    		and intentioncustid=#{intentioncustid} 
+		</if>
+  	 </update>
+</mapper>

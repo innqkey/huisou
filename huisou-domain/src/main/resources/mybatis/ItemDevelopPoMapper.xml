@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.ItemDevelopPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.ItemDevelopPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="devid" jdbcType="INTEGER" property="devid" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="devdatebegin" jdbcType="TIMESTAMP" property="devdatebegin" />
+    <result column="devdateend" jdbcType="TIMESTAMP" property="devdateend" />
+    <result column="devstatus" jdbcType="INTEGER" property="devstatus" />
+    <result column="delystatus" jdbcType="INTEGER" property="delystatus" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+   <!-- 多条件查找项目记录  -->
+  	<select id="queryByMultiParas"  parameterType="map" resultMap="BaseResultMap">
+  		select *
+  		from crm_item_develop s
+  		where 1=1
+  		<if test="itemname != null and itemname !=''">
+  			and itemname like CONCAT('%', #{itemname},'%')
+  		</if>
+  		<if test="createby != null and createby !=''">
+  			and createby = #{createby}
+  		</if>
+  		ORDER BY s.createdate DESC
+  	</select>
+</mapper>

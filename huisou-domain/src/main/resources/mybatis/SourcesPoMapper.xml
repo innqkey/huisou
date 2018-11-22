@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.SourcesPoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.SourcesPo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="sourcesid" jdbcType="INTEGER" property="sourcesid"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="sourcesname" jdbcType="VARCHAR" property="sourcesname"/>
+        <result column="menuid" jdbcType="INTEGER" property="menuid"/>
+        <result column="target" jdbcType="VARCHAR" property="target"/>
+        <result column="standby2" jdbcType="VARCHAR" property="standby2"/>
+    </resultMap>
+
+    <update id="update" parameterType="com.huisou.po.SourcesPo">
+        update crm_sources
+        <set>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="sourcesname != null">
+                sourcesname = #{sourcesname,jdbcType=VARCHAR},
+            </if>
+            <if test="menuid != null">
+                menuid = #{menuid,jdbcType=INTEGER},
+            </if>
+            <if test="target != null">
+                target = #{target,jdbcType=VARCHAR},
+            </if>
+            <if test="standby2 != null">
+                standby2 = #{standby2,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where sourcesid = #{sourcesid,jdbcType=INTEGER}
+    </update>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from crm_sources
+    </select>
+</mapper>

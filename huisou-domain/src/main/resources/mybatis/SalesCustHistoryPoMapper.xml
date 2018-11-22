@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.SalesCustHistoryPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.SalesCustHistoryPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="salehistid" jdbcType="INTEGER" property="salehistid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="beforesaleid" jdbcType="INTEGER" property="beforesaleid" />
+    <result column="endsaleid" jdbcType="INTEGER" property="endsaleid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="changecause" jdbcType="VARCHAR" property="changecause" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+  <resultMap id="SaleCustHistUserMap" type="com.huisou.vo.SaleCustHistUserVo">
+    <result column="salehistid" jdbcType="INTEGER" property="salehistid" />
+    <result column="custid" jdbcType="INTEGER" property="custid" />
+    <result column="beforesaleid" jdbcType="INTEGER" property="beforesaleid" />
+    <result column="endsaleid" jdbcType="INTEGER" property="endsaleid" />
+    <result column="itemid" jdbcType="INTEGER" property="itemid" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="changecause" jdbcType="VARCHAR" property="changecause" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="companyname" jdbcType="VARCHAR" property="companyname" />
+    <result column="itemname" jdbcType="VARCHAR" property="itemname" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="beforesalename" jdbcType="VARCHAR" property="beforesalename" />
+    <result column="endsalename" jdbcType="VARCHAR" property="endsalename" />
+  </resultMap>
+  
+  <select id="selectByItemId" parameterType="java.lang.Integer" resultType="SalesCustHistoryPo">
+  		select * from crm_sales_cust_history  where itemid=#{itemid}
+  </select>
+  
+  <select id="findCustomerHistoryBycustid" resultType="SalesCustHistoryPo">
+  		SELECT * FROM `crm_sales_cust_history`  where itemid is  NULL and custid=#{custid}
+  </select>
+  
+  <select id="selectHistoryByEndSaleidAndCustid" resultType="SalesCustHistoryPo">
+	SELECT
+			*
+		FROM
+			`crm_sales_cust_history`	
+		WHERE
+			itemid IS NULL
+		AND custid = #{custid}
+		AND endsaleid = #{endsaleid}
+		ORDER BY
+			salehistid DESC  		
+
+  </select>
+  
+  <select id="findCustomerHistUserList" resultMap="SaleCustHistUserMap">
+	 	SELECT h.salehistid,h.custid,h.beforesaleid,h.endsaleid,h.itemid,h.createby,h.createdate,h.changecause,c.contact,c.companyname,i.itemname,u.username,
+			bef.salename as beforesalename,
+			ed.salename as endsalename
+		from crm_sales_cust_history h
+		LEFT JOIN crm_customer c on h.custid = c.custid
+		LEFT JOIN crm_items i on h.itemid = i.itemid
+		LEFT JOIN crm_user u on h.createby = u.userid
+		LEFT JOIN crm_salesman bef on h.beforesaleid = bef.saleid
+		LEFT JOIN crm_salesman ed on h.endsaleid = ed.saleid
+		<where>
+			<if test="searchValue != null and searchValue !='' ">
+				c.contact like CONCAT('%','${searchValue}','%' )
+		    </if>
+		    <if test="searchValue != null and searchValue !='' ">
+				or i.itemname like CONCAT('%','${searchValue}','%' )
+		    </if>
+		    <if test="searchValue != null and searchValue !='' ">
+				or bef.salename like CONCAT('%','${searchValue}','%' )
+		    </if>
+		    <if test="searchValue != null and searchValue !='' ">
+				or ed.salename like CONCAT('%','${searchValue}','%' )
+		    </if>
+		    <if test='beginDate !=null and beginDate!="" '>
+				<![CDATA[ and h.createdate >='${beginDate}' ]]>
+			</if>
+			<if test='endDate !=null and endDate!="" '>
+				<![CDATA[ and h.createdate<='${endDate}' ]]>
+			</if>
+		</where>
+		<![CDATA[ ORDER BY h.salehistid desc ]]>
+  </select>
+</mapper>

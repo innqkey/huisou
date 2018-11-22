@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.PostPoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.PostPo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="postid" jdbcType="INTEGER" property="postid"/>
+        <result column="userid" jdbcType="INTEGER" property="userid"/>
+        <result column="organizeid" jdbcType="INTEGER" property="organizeid"/>
+        <result column="postname" jdbcType="VARCHAR" property="postname"/>
+        <result column="standby1" jdbcType="VARCHAR" property="standby1"/>
+        <result column="standby2" jdbcType="VARCHAR" property="standby2"/>
+    </resultMap>
+
+    <select id="findByOrgId" parameterType="java.util.List" resultMap="BaseResultMap">
+
+        select * from crm_post
+        where
+        1=1
+        <if test="orgIds != null">
+            and organizeid in
+            <foreach collection="orgIds" index="index" item="item" separator="," open="(" close=")">
+                <if test="item!=null">
+                    #{item}
+                </if>
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+       select * from crm_post order by organizeid
+    </select>
+	
+	<delete id="deleteByOid" parameterType="java.lang.Integer">
+		DELETE FROM crm_post WHERE organizeid=#{orgid}
+	</delete>
+	
+	
+	
+	<delete id="deleteByPid" parameterType="java.lang.Integer">
+		DELETE FROM crm_post WHERE postid=#{postid}
+	</delete>
+	
+	<select id="findPostByOrgid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select * from crm_post WHERE organizeid=#{organizeid}
+	</select>
+</mapper>

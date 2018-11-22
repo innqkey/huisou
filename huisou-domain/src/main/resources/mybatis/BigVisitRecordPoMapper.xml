@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.BigVisitRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.BigVisitRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="visitid" jdbcType="INTEGER" property="visitid" />
+    <result column="bigid" jdbcType="INTEGER" property="bigid" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="salename" jdbcType="VARCHAR" property="salename" />
+    <result column="visitway" jdbcType="INTEGER" property="visitway" />
+    <result column="visitwayname" jdbcType="VARCHAR" property="visitwayname" />
+    <result column="visitremarks" jdbcType="VARCHAR" property="visitremarks" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+  <select id="findBigVisit" parameterType="int" resultType="com.huisou.po.BigVisitRecordPo">
+  select * from crm_big_visit_record WHERE bigid=#{bigid}
+  </select>
+  <update id="updatebigVisit" parameterType="com.huisou.po.BigVisitRecordPo">
+  update crm_big_visit_record 
+  <set>
+   <if test="visitway!=null">
+   	visitway=#{visitway},
+   </if>
+   <if test="visitwayname!=null">
+   	visitwayname=#{visitwayname},
+   </if>
+   <if test="visitremarks!=null">
+   	visitremarks=#{visitremarks},
+   </if>
+   <if test="createdate!=null">
+   	createdate=#{createdate},
+   </if>
+   <if test="updateby!=null">
+   	updateby=#{updateby},
+   </if>
+  </set>
+  where visitid=#{visitid}
+  </update>
+  
+  <insert id="insertBigVisit" parameterType="com.huisou.po.BigVisitRecordPo">
+  	INSERT INTO crm_big_visit_record (bigid, saleid, salename, visitway, visitwayname, visitremarks, createby, createdate) VALUES (#{bigid}, #{saleid}, #{salename}, #{visitway}, #{visitwayname}, #{visitremarks}, #{createby}, #{createdate})
+  	
+  </insert>
+</mapper>

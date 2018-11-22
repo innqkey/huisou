@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.UrlPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.UrlPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="urlid" jdbcType="INTEGER" property="urlid" />
+    <result column="accountype" jdbcType="INTEGER" property="accountype" />
+    <result column="accountypename" jdbcType="VARCHAR" property="accountypename" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+
+	<select id="findAll" resultType="com.huisou.po.UrlPo">
+		SELECT * FROM crm_url
+	</select>
+  	
+  	<select id="findUrlPo" parameterType="java.lang.String" resultType="com.huisou.po.UrlPo">
+  		SELECT * FROM crm_url where accountypename=#{accountypename}
+  	</select>
+  	
+  	<select id="findUrlPoByid" parameterType="java.lang.Integer" resultType="com.huisou.po.UrlPo">
+  		SELECT * FROM crm_url where urlid=#{urlid}
+  	</select>
+</mapper>

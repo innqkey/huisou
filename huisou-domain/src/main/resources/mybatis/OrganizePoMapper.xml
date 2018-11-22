@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.OrganizePoMapper">
+    <resultMap id="BaseResultMap" type="com.huisou.po.OrganizePo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="orgid" jdbcType="INTEGER" property="orgid"/>
+        <!--<result column="userid" jdbcType="INTEGER" property="userid"/>-->
+        <result column="departname" jdbcType="VARCHAR" property="departname"/>
+        <result column="left" jdbcType="INTEGER" property="left"/>
+        <result column="right" jdbcType="INTEGER" property="right"/>
+        <result column="standby1" jdbcType="VARCHAR" property="standby1"/>
+        <result column="standby2" jdbcType="VARCHAR" property="standby2"/>
+    </resultMap>
+
+    <select id="findAllOrgId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <![CDATA[
+
+        SELECT
+        crm_organize.orgid,crm_organize.departname
+        FROM
+        crm_organize ,
+        (
+        SELECT
+        crm_organize.`right` ,
+        crm_organize.`left`
+        FROM
+        crm_organize
+        WHERE
+        crm_organize.orgid = #{orgid,jdbcType=INTEGER}
+        ) t
+        WHERE
+        crm_organize.`left` >= t.`left`
+        AND crm_organize.`right` <= t.`right`;
+
+        ]]>
+    </select>
+
+    <select id="findFatherByOrgId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+            <![CDATA[
+
+
+            SELECT
+            	crm_organize.*
+            FROM
+            	crm_organize ,
+            	(
+            		SELECT
+            			crm_organize.`right` ,
+            			crm_organize.`left`
+            		FROM
+            			crm_organize
+            		WHERE
+            			crm_organize.orgid =  #{orgid,jdbcType=INTEGER}
+
+            	) t
+            WHERE
+            	crm_organize.`left` < t.`left`
+            AND crm_organize.`right` > t.`right`
+            order by orgid DESC
+            limit 1
+
+        ]]>
+        </select>
+
+    <select id="findAllFatherByOrgId" resultMap="BaseResultMap">
+        SELECT
+        crm_organize.*
+        FROM
+        crm_organize
+        WHERE
+        crm_organize.departname  is not null and crm_organize.orgid!=0
+    </select>
+
+
+    <select id="findRight" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT crm_organize.`right`  FROM crm_organize WHERE crm_organize.orgid = #{orgid,jdbcType=INTEGER};
+    </select>
+
+    <update id="updateLftRgt" parameterType="java.lang.Integer">
+        <![CDATA[
+
+
+        UPDATE crm_organize SET crm_organize.`right` = crm_organize.`right` + 2 WHERE crm_organize.`right` >= #{right,jdbcType=INTEGER};
+        UPDATE crm_organize SET crm_organize.`left` = crm_organize.`left` + 2 WHERE crm_organize.`left` >= #{right,jdbcType=INTEGER};
+
+
+        ]]>
+    </update>
+	
+	 <update id="reduceLftRgt" parameterType="java.lang.Integer">
+        <![CDATA[
+
+
+        UPDATE crm_organize SET crm_organize.`right` = crm_organize.`right` - #{deleteNum} WHERE crm_organize.`right` > #{right,jdbcType=INTEGER};
+        UPDATE crm_organize SET crm_organize.`left` = crm_organize.`left` - #{deleteNum} WHERE crm_organize.`left` > #{right,jdbcType=INTEGER};
+
+
+        ]]>
+    </update>
+	
+    <insert id="insertOrg" parameterType="java.util.Map">
+      INSERT INTO crm_organize( departname , `left` , `right`,standby1)
+      VALUES  
+      (#{dep,jdbcType=VARCHAR} ,#{right,jdbcType=INTEGER} ,#{right,jdbcType=INTEGER} + 1,#{standby1});
+    </insert>
+
+    <select id="findInfoByUserId" parameterType="java.lang.Integer" resultType="com.huisou.vo.OrgPostVo">
+        select n.orgid,n.departname,m.postid,m.userid
+        from `crm_user` m ,`crm_organize` n
+        where m.orgid = n.orgid
+        and m.userid = #{userid,jdbcType=INTEGER}
+
+    </select>
+
+
+    <select id="findMoreInfoByUserId" parameterType="java.util.List" resultType="com.huisou.vo.OrgPostVo">
+        <!--SELECT-->
+        <!--n.orgid ,-->
+        <!--n.departname ,-->
+        <!--m.postid ,-->
+        <!--m.userid ,-->
+        <!--m.postname ,-->
+        <!--t.petname-->
+        <!--FROM-->
+        <!--`crm_post` m ,-->
+        <!--`crm_organize` n ,-->
+        <!--`crm_user` t-->
+        <!--WHERE-->
+        <!--m.organizeid = n.orgid-->
+        <!--AND t.userid = m.userid-->
+        <!--<if test="userids != null">-->
+            <!--AND m.userid IN-->
+            <!--<foreach collection="userids" index="index" item="item" separator="," open="(" close=")">-->
+                <!--<if test="item!=null">-->
+                    <!--#{item}-->
+                <!--</if>-->
+            <!--</foreach>-->
+        <!--</if>-->
+        SELECT
+        u.userid ,
+        u.petname ,
+        u.orgid ,
+        u.postid ,
+        o.departname ,
+        p.postname,
+        p.departname as dep2
+        FROM
+        (
+        SELECT
+        u.userid ,
+        u.petname ,
+        u.postid ,
+        u.orgid
+        FROM
+        crm_user u
+        WHERE
+        u.`status` = 1
+        <if test="userids != null">
+            AND u.userid IN
+            <foreach collection="userids" index="index" item="item" separator="," open="(" close=")">
+                <if test="item!=null">
+                    #{item}
+                </if>
+            </foreach>
+        </if>
+        ) u
+        LEFT JOIN crm_organize o ON u.orgid = o.orgid
+        LEFT JOIN (
+        select t1.* ,t2.departname
+        from crm_post t1 ,crm_organize t2
+        where orgid = organizeid
+        ) p ON u.postid = p.postid
+    </select>
+	
+	<select id="selectOrganizePo" resultType="com.huisou.po.OrganizePo">
+		SELECT * FROM crm_organize 
+		<where>
+			<if test="orgid!=null and orgid!=''">
+				and orgid =#{orgid}
+			</if>
+			<if test="departname!=null and departname!=''">
+				and departname =#{departname}
+			</if>
+			<if test="left!=null and left!=''">
+				and `left`=#{left}
+			</if>
+			<if test="right!=null and right!=''">
+				and `right`=#{right}
+			</if>
+			<if test="standby1!=null and standby1!=''">
+				and standby1=#{standby1}
+			</if>
+			<if test="standby2!=null and standby2!=''">
+				and standby2 = #{standby2}
+			</if>
+		</where>
+	</select>
+	
+	<update id="edit">
+		UPDATE crm_organize SET departname=#{orgname} WHERE orgid=#{orgid}
+	</update>
+	
+	<select id="findChildOrgidsByorgid" parameterType="java.lang.Integer" resultType="map">
+		SELECT
+			t1.orgid
+		FROM
+			crm_organize t1 ,
+			(
+				SELECT
+					`left`,
+					`right`
+				FROM
+					crm_organize
+				WHERE
+					orgid = #{orgid}
+			) t2
+		WHERE
+			t1.`left` &gt; t2.`left`
+		AND t1.`right` &lt; t2.`right`
+	</select>
+	
+	<delete id="deleteByOid" parameterType="java.lang.Integer">
+		DELETE FROM crm_organize WHERE orgid=#{orgid}
+	</delete>
+	
+	<select id="findOrgByOrgid" parameterType="java.lang.Integer" resultType="com.huisou.po.OrganizePo">
+		SELECT * FROM crm_organize WHERE orgid=#{orgid}
+	</select>
+</mapper>

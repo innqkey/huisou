@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.RenewTraceMapper">
+	
+	<select id="findRenewTraceByItemid"  parameterType="java.lang.Integer" resultType="com.huisou.po.UniversalPo">
+		SELECT
+			t1.*, t2.itemname,
+			t3.contact,
+			t4.petname
+		FROM
+			(
+				(
+					`crm_renew_trace` t1
+					LEFT JOIN crm_items t2 ON t1.itemid = t2.itemid
+				)
+				LEFT JOIN crm_customer t3 ON t2.custid = t3.custid
+			)
+		LEFT JOIN crm_user t4 ON t1.createby = t4.userid
+		WHERE
+			t1.itemid = #{itemid}
+		ORDER BY t1.renewdate DESC
+  </select>
+</mapper>

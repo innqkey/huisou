@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.TrainingRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.TrainingRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="trainingrecordid" jdbcType="INTEGER" property="trainingrecordid" />
+    <result column="courseid" jdbcType="INTEGER" property="courseid" />
+    <result column="intentioncustid" jdbcType="INTEGER" property="intentioncustid" />
+    <result column="trainingcount" jdbcType="INTEGER" property="trainingcount" />
+   	<result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="saleid" jdbcType="INTEGER" property="saleid" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+  
+  	<select id="selectMaxTrainingCount" parameterType="java.lang.Integer" resultType="com.huisou.po.TrainingRecordPo">
+ 		SELECT
+			*
+		FROM
+			crm_training_record
+		WHERE
+			(
+				SELECT
+					MAX(trainingcount)
+				FROM
+					crm_training_record
+				WHERE
+					intentioncustid = #{intentioncustid}
+			) = trainingcount
+			and intentioncustid = #{intentioncustid}
+  	</select>
+  	
+ 	<select id="queryByParams" parameterType="java.lang.Integer" resultType="com.huisou.vo.TrainingRecordVo">
+	SELECT
+		t.name,
+		t.phone,
+		t.companyname,
+		t.address,
+		t.createby AS saleid,
+		t3.createby,
+		t3.coursename,
+		t3.courseaddress,
+		t3.coursetime,
+		t4.petname AS username,
+		t5.petname AS salename
+		FROM (
+			SELECT
+				t1.createby,
+				t1.intentioncustid,
+				t2.coursename,
+				t2.courseaddress,
+				t2.coursetime
+			FROM
+				crm_training_record t1
+			LEFT JOIN crm_training_course t2 ON t1.courseid = t2.courseid
+			where 1=1
+  				<if test="trainingrecordid != null and trainingrecordid !=''">
+  					and t1.trainingrecordid=#{trainingrecordid}
+  				</if>
+  			) t3
+		LEFT JOIN crm_intention_cust t ON t.intentioncustid = t3.intentioncustid
+		LEFT JOIN crm_user t4 ON t4.userid = t3.createby
+		LEFT JOIN crm_user t5 ON t5.userid = t.createby
+ 	</select>
+ 	
+ 	<select id="selectByMultiParas" parameterType="Map" resultType="com.huisou.vo.TrainingRecordVo">
+ 			SELECT
+			t1.*, t2.`name`,
+			t2.phone,
+			t2.companyname,
+			t3.coursename,
+			t3.courseaddress,
+			t3.coursedays,
+			t3.coursetime,
+			t5.petname AS username,
+			t6.petname AS salename
+		FROM
+			crm_training_record t1
+		LEFT JOIN crm_intention_cust t2 ON t1.intentioncustid = t2.intentioncustid
+		LEFT JOIN crm_training_course t3 ON t1.courseid = t3.courseid
+		LEFT JOIN crm_user t5 ON t1.createby = t5.userid
+		LEFT JOIN crm_user t6 ON t1.saleid = t6.userid
+		where 1=1
+		<if test="createby!= null and createby !=''">
+  			and t1.createby=#{createby}
+  		</if>
+  		<if test="name != null and name !=''">
+  			and t2.name like CONCAT('%', #{name},'%')
+  		</if>
+  		<if test="companyname != null and companyname != '' ">
+  			and t2.companyname like CONCAT('%', #{companyname},'%')
+  		</if>		  
+  		<if test="salename != null and salename != '' ">
+  			and t6.petname like CONCAT('%', #{salename},'%')
+  		</if>		  
+  		<if test="username != null and username != '' ">
+  			and t5.petname like CONCAT('%', #{username},'%')
+  		</if>		  
+  		<if test="coursename != null and coursename != '' ">
+  			and t3.coursename like CONCAT('%', #{coursename},'%')
+  		</if>		  
+		<if test="beginDate!=null and beginDate!=''">
+    		<![CDATA[  and DATE_FORMAT(t3.coursetime, '%Y-%m-%d') >= DATE_FORMAT(#{beginDate}, '%Y-%m-%d')   ]]>
+		</if>
+		<if test="endDate!=null and endDate!=''">
+   			<![CDATA[  and DATE_FORMAT(t3.coursetime, '%Y-%m-%d') <= DATE_FORMAT(#{endDate}, '%Y-%m-%d')    ]]>
+		</if>
+		ORDER BY t3.coursetime DESC
+ 	</select>
+</mapper>

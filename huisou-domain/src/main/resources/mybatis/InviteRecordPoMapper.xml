@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huisou.mapper.InviteRecordPoMapper">
+  <resultMap id="BaseResultMap" type="com.huisou.po.InviteRecordPo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="inviterecordid" jdbcType="INTEGER" property="inviterecordid" />
+    <result column="courseid" jdbcType="INTEGER" property="courseid" />
+    <result column="intentioncustid" jdbcType="INTEGER" property="intentioncustid" />
+    <result column="inviteidcount" jdbcType="INTEGER" property="inviteidcount" />
+   	<result column="createby" jdbcType="INTEGER" property="createby" />
+    <result column="createdate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="updateby" jdbcType="INTEGER" property="updateby" />
+    <result column="updatedate" jdbcType="TIMESTAMP" property="updatedate" />
+    <result column="standby1" jdbcType="VARCHAR" property="standby1" />
+    <result column="standby2" jdbcType="VARCHAR" property="standby2" />
+  </resultMap>
+ 	<select id="getInviteidcountMax" parameterType="java.lang.Integer" resultType="com.huisou.po.InviteRecordPo">
+ 		SELECT
+			*
+		FROM
+			crm_invite_record
+		WHERE
+			(
+				SELECT
+					MAX(inviteidcount) 
+				FROM
+					crm_invite_record
+				WHERE
+					intentioncustid = #{intentioncustid}
+			) = inviteidcount
+			and intentioncustid = #{intentioncustid}
+ 	</select>
+ 	<select id="getInviteRecordByUserid" resultType="com.huisou.vo.InviteRecordVo">
+ 		SELECT
+			t1.*, t2.`name`,
+			t2.phone,
+			t2.companyname,
+			t3.coursename,
+			t3.courseaddress,
+			t3.coursedays,
+			t3.coursetime,
+			t5.petname
+		FROM
+			crm_invite_record t1
+		LEFT JOIN crm_intention_cust t2 ON t1.intentioncustid = t2.intentioncustid
+		LEFT JOIN crm_training_course t3 ON t1.courseid = t3.courseid
+		LEFT JOIN crm_user t5 ON t1.createby = t5.userid
+		<where>
+		<if test="name!=null and name!=''">
+			and t2.`name` like CONCAT('%',#{name},'%')
+		</if>
+		<if test="companyname!=null and companyname!=''">
+			and t2.companyname like CONCAT('%',#{companyname},'%')
+		</if>
+		<if test="petname!=null and petname!=''">
+			and t5.petname like CONCAT('%',#{petname},'%')
+		</if>
+		<if test="coursename!=null and coursename!=''">
+			and t3.coursename like CONCAT('%',#{coursename},'%')
+		</if>
+		<if test="createby!=0 and leader==true">
+			and t1.createby=#{createby}
+		</if>
+		<if test="startDate!=null and startDate!=''">
+			and t2.createdate &gt;= #{startDate}
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			and t2.createdate &lt;= #{endDate}
+		</if>
+		</where>
+		ORDER BY t1.inviterecordid DESC
+ 	</select>
+ 	
+ 	<update id="update" parameterType="java.lang.Integer">
+ 		UPDATE crm_invite_record
+		SET courseid = #{courseid}
+		WHERE
+			inviterecordid = #{inviterecordid}
+ 	</update>
+ 	
+ 	<select id="getDetail" parameterType="java.lang.Integer" resultType="com.huisou.vo.InviteRecordVo">
+ 		SELECT
+			t1.*, t2.`name`,
+			t2.phone,
+			t2.companyname,
+			t2.address,
+			t3.coursename,
+			t3.coursetime,
+			t3.courseaddress,
+			t3.coursedays,
+			t4.petname
+		FROM
+			crm_invite_record t1,
+			crm_intention_cust t2,
+			crm_training_course t3,
+			crm_user t4
+		WHERE
+			inviterecordid = #{inviterecordid}
+		AND t1.intentioncustid = t2.intentioncustid
+		AND t1.courseid = t3.courseid
+		AND t1.createby = t4.userid
+ 	</select>
+</mapper>
