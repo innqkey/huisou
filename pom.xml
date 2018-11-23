@@ -55,8 +55,19 @@
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-starter-logging</artifactId>
 					</exclusion>
+					<exclusion><!-- 移除嵌入式tomcat插件 eclipse 使用外部 tomcat 打包时使用 -->
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-tomcat</artifactId>
+                    </exclusion>
 				</exclusions>
 			</dependency>
+			<!-- 作用外部tomcat时加的依赖 -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+                <scope>provided</scope>
+            </dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jpa</artifactId>
