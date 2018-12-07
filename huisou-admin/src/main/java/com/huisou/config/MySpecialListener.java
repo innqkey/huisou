@@ -19,6 +19,8 @@ import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 /**
  * @author qinkai
  * @date 2018年12月7日
+ * com.mysql.jdbc.Driver] but failed to unregister it when the web application was stopped
+ * 解决tomcat 关闭时，数据库连接池警告
  */
 @Component
 public class MySpecialListener implements ServletContextListener{
