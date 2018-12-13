@@ -13,20 +13,18 @@
         <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
             <property name="mappers" value="com.common.MyMapper"/>
         </plugin>
-
+        
+        <!-- 数据库连接属性 -->
         <jdbcConnection driverClass="${spring.datasource.driver-class-name}"
                         connectionURL="${spring.datasource.url}"
                         userId="${spring.datasource.username}"
                         password="${spring.datasource.password}"/>
-
-        <javaModelGenerator targetPackage="com.huisou.dao" targetProject="src/main/java"/>
-
-		
+        <!-- 生成实体类配置 -->
+        <javaModelGenerator targetPackage="com.huisou.po" targetProject="src/main/java"/>
+		<!-- 生成映射文件配置 -->
         <sqlMapGenerator targetPackage="mybatis" targetProject="src/main/resources"/>
-
-
+        <!-- 生成映射接口配置 -->
         <javaClientGenerator targetPackage="com.huisou.mapper" targetProject="src/main/java" type="XMLMAPPER"/>
-
 
         <table tableName="user" domainObjectName="UserDao">
             <!--这边默认的主键为自增的方式 所以在设计数据的时候要匹配-->

@@ -23,7 +23,7 @@ import com.common.BaseUtil;
 @SpringBootApplication
 @EnableScheduling
 @MapperScan(basePackages = "com.huisou.mapper")
-@EnableJpaRepositories("com.huisou.repository")
+//@EnableJpaRepositories("com.huisou.repository")
 @EnableTransactionManagement//开启事务
 //public class AppConfig{
 public class AppConfig extends SpringBootServletInitializer{

@@ -56,18 +56,18 @@
 						<artifactId>spring-boot-starter-logging</artifactId>
 					</exclusion>
 					<exclusion><!-- 移除嵌入式tomcat插件 eclipse 使用外部 tomcat 打包时使用 -->
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-tomcat</artifactId>
-                    </exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-tomcat</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<!-- 作用外部tomcat时加的依赖 -->
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
-                <scope>provided</scope>
-            </dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -134,11 +134,11 @@
 				<artifactId>spring-boot-starter-log4j2</artifactId>
 				<version>${spring-version}</version>
 			</dependency>
-            <dependency> <!-- tomcat关闭时 log4j2警告 -->
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-web</artifactId>
-                <version>2.11.1</version>
-            </dependency>
+			<dependency>  <!--tomcat关闭时 log4j2警告 -->
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-web</artifactId>
+				<version>2.11.1</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-devtools</artifactId>
@@ -204,6 +204,12 @@
 				<groupId>javax.persistence</groupId>
 				<artifactId>persistence-api</artifactId>
 				<version>1.0.2</version>
+			</dependency>
+			<!-- fastdfs -->
+			<dependency>
+				<groupId>org.csource</groupId>
+				<artifactId>fastdfs-client-java</artifactId>
+				<version>1.27</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
