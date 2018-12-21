@@ -12,12 +12,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.common.BaseUtil;
 
 /**
  * Created by miaorf on 2016/6/19.
@@ -45,11 +42,14 @@ public class AppConfig extends SpringBootServletInitializer {
         return builder.sources(AppConfig.class);
     }
 
-    // 更改上传文件大小限制
+    /*// 更改上传文件大小限制
     @Bean
     public MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory(); // 允许上传的文件最大值
-        factory.setMaxRequestSize("500MB");
+        MultipartConfigFactory factory = new MultipartConfigFactory(); 
+        // 允许上传的文件最大值
+        factory.setMaxFileSize("100MB");
+        //总上传数据大小
+        factory.setMaxRequestSize("300MB");
         return factory.createMultipartConfig();
-    }
+    }*/
 }
