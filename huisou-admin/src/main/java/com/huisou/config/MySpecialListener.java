@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.common.ThreadPoolUtil;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
 
@@ -30,10 +31,12 @@ public class MySpecialListener implements ServletContextListener{
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         logger.info("****************Servlet Context Start******************");
+        ThreadPoolUtil.init();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        ThreadPoolUtil.destroy();
         logger.info("****************Servlet Context Shutdown******************");
         logger.info("****************Destroying Context..............................................");
         try {

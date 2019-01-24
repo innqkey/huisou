@@ -1,6 +1,7 @@
 package com.huisou.controller;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.common.FastDFSClient;
 import com.common.ResUtils;
+import com.common.ThreadPoolUtil;
 
 /**
  * @author qinkai
@@ -67,6 +69,46 @@ public class FastDFSController {
         return ResUtils.execRes();
     }
     
+    //多线程,批量上传
+    @PostMapping("/batchs/upload")
+    public String batchsFileUpload(HttpServletRequest request){
+        List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
+        if (null != files && files.size() > 0){
+            //使添加线程等待转换线程执行后执行的工具
+            final CountDownLatch doWork = new CountDownLatch(files.size()); 
+            long startTime = System.currentTimeMillis();
+            try {
+                for (MultipartFile file : files) {
+                    if (null == file || file.isEmpty()) {
+                        doWork.countDown();
+                        logger.info("上传的文件为空，文件名: ", file.getOriginalFilename());
+                        continue;
+                    }
+                    ThreadPoolUtil.submit(new Runnable() {
+                        public void run() {
+                            try {
+                                String path=FastDFSClient.saveFile(file);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //递减锁存器的计数
+                            doWork.countDown();
+                        }
+                    });
+                }
+                //添加线程等待转换线执行
+                doWork.await();
+                long entTime = System.currentTimeMillis();
+                logger.info("上传文件总数 " + files.size() + ", 用时, " + (entTime - startTime) / 1000 + " s");
+                return ResUtils.okRes();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("上传文件失败");;
+            }
+        }
+        return ResUtils.execRes("上传文件为空");
+    }
+    
     //filenName: group1/M00/00/00/rBDHA1wTK3eAUnCkAAAFSQy1dxc203.png
     @GetMapping("file/delete")
     public String deleteFileFromDFS(String fileName){
@@ -91,6 +133,41 @@ public class FastDFSController {
             logger.error("delete file error",e);
         }
         return ResUtils.errRes(ResUtils.exceCode, "删除文件失败");
+    }
+    
+    @GetMapping("file/test")
+    public String test (){
+        final CountDownLatch doWork = new CountDownLatch(10); 
+        for (int i = 0 ; i < 10; i++){
+            //使添加线程等待转换线程执行后执行的工具
+            try {
+                    ThreadPoolUtil.submit(new Runnable() {
+                        public void run() {
+                            try {
+                                FastDFSClient.uploadFile();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //递减锁存器的计数
+                            doWork.countDown();
+                        }
+                    });
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("上传文件失败");
+            }
+        }
+        
+        //添加线程等待转换线执行
+        try {
+            doWork.await();
+            logger.info("测试完成》》》》》》》》》》》》");
+            return ResUtils.okRes();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return ResUtils.execRes();
     }
     
 }

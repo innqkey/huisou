@@ -1,5 +1,6 @@
 package com.common;
 
+import org.apache.commons.io.IOUtils;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,7 @@ import java.io.*;
 
 public class FastDFSClient {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(FastDFSClient.class);
-
+	
 	static {
 		try {
 			String filePath = new ClassPathResource("fdfs/fdfs_client.conf").getFile().getAbsolutePath();;
@@ -46,6 +47,7 @@ public class FastDFSClient {
 	    return path;
 	}
 	
+	// 多线程下使用 每次new storage tracker
 	public static String[] upload(FastDFSFile file) {
 		logger.info("File Name: " + file.getName() + "    File Length:" + file.getContent().length);
 
@@ -55,7 +57,12 @@ public class FastDFSClient {
 		long startTime = System.currentTimeMillis();
 		String[] uploadResults = null;
 		StorageClient storageClient=null;
-		try {
+		try {/*
+		    String filePath = new ClassPathResource("fdfs/fdfs_client.conf").getFile().getAbsolutePath();;
+            ClientGlobal.init(filePath);
+            TrackerClient trackerClient = new TrackerClient();
+            TrackerServer trackerServer = trackerClient.getConnection();
+            storageClient = new StorageClient(trackerServer, null);*/
 			storageClient = getTrackerClient();
 			uploadResults = storageClient.upload_file(file.getContent(), file.getExt(), meta_list);
 		} catch (IOException e) {
@@ -74,6 +81,35 @@ public class FastDFSClient {
 		logger.info("upload file successfully!!!" + "  group_name:" + groupName + ", remoteFileName:" + " " + remoteFileName);
 		return uploadResults;
 	}
+	/*  单线程下使用
+	public static String[] upload(FastDFSFile file) {
+	    logger.info("File Name: " + file.getName() + "    File Length:" + file.getContent().length);
+	    
+	    NameValuePair[] meta_list = new NameValuePair[1];
+	    meta_list[0] = new NameValuePair("author", file.getAuthor());
+	    
+	    long startTime = System.currentTimeMillis();
+	    String[] uploadResults = null;
+	    StorageClient storageClient=null;
+	    try {
+	        storageClient = getTrackerClient();
+	        uploadResults = storageClient.upload_file(file.getContent(), file.getExt(), meta_list);
+	    } catch (IOException e) {
+	        logger.error("IO Exception when uploadind the file:" + file.getName(), e);
+	    } catch (Exception e) {
+	        logger.error("Non IO Exception when uploadind the file:" + file.getName(), e);
+	    }
+	    logger.info("upload_file time used:" + (System.currentTimeMillis() - startTime) + " ms");
+	    
+	    if (uploadResults == null && storageClient!=null) {
+	        logger.error("upload file fail, error code:" + storageClient.getErrorCode());
+	    }
+	    String groupName = uploadResults[0];
+	    String remoteFileName = uploadResults[1];
+	    
+	    logger.info("upload file successfully!!!" + "  group_name:" + groupName + ", remoteFileName:" + " " + remoteFileName);
+	    return uploadResults;
+	}*/
 
 	public static FileInfo getFile(String groupName, String remoteFileName) {
 		try {
@@ -144,4 +180,20 @@ public class FastDFSClient {
 		TrackerServer trackerServer = trackerClient.getConnection();
 		return  trackerServer;
 	}
+
+    public static void uploadFile() {
+        String filePath="D:\\uploadPhotos\\0.jpg";
+        byte[] content;
+        try {
+            content = IOUtils.toByteArray(new FileInputStream(new File(filePath)));
+            FastDFSFile dfsfile = new FastDFSFile("test", content, "jpg");
+            for(int i = 0; i < 10; i++){
+                upload(dfsfile);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        logger.info("完成一次线程！");
+    }
 }
